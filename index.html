@@ -1,0 +1,2180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NeuroVision AI — Eye Health Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════
+   ROOT & BASE
+═══════════════════════════════════ */
+:root{
+  --bg:#04060f;--bg2:#070c1a;
+  --panel:rgba(10,16,35,0.88);--panel2:rgba(14,22,48,0.7);
+  --border:rgba(82,145,255,0.18);--border2:rgba(82,145,255,0.38);
+  --accent:#3b82f6;--accent2:#60a5fa;
+  --teal:#0ff4c6;--teal2:#00d4a8;
+  --violet:#a855f7;--amber:#f59e0b;
+  --red:#ef4444;--green:#22c55e;
+  --text:#e8edf8;--text2:#8899bb;--text3:#4a6080;
+  --r:16px;--shadow:0 8px 48px rgba(0,30,100,0.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+.page{display:none;min-height:100vh;position:relative;z-index:1}
+.page.active{display:block}
+
+/* ═══════════════════════════════════
+   NAV
+═══════════════════════════════════ */
+.page-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 36px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);background:rgba(4,6,15,.7)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;background:linear-gradient(135deg,var(--teal),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.back-btn{background:none;border:1px solid var(--border);border-radius:8px;color:var(--text2);padding:7px 16px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;transition:.2s;display:flex;align-items:center;gap:6px}
+.back-btn:hover{border-color:var(--border2);color:var(--text)}
+.page-steps{display:flex;gap:6px;align-items:center}
+.ps-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.1);transition:.3s}
+.ps-dot.done{background:var(--teal)}
+.ps-dot.active{background:var(--accent);width:22px;border-radius:4px}
+
+/* ═══════════════════════════════════
+   BUTTONS
+═══════════════════════════════════ */
+.btn{font-family:'Syne',sans-serif;font-weight:700;border:none;border-radius:12px;cursor:pointer;transition:.25s;font-size:.95rem}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#1d4ed8);color:#fff;padding:13px 28px;box-shadow:0 0 28px rgba(59,130,246,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(59,130,246,.55)}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--text2);padding:13px 22px;border:1px solid var(--border)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:var(--border2);color:var(--text)}
+.btn-full{width:100%;padding:15px;font-size:1rem;border-radius:12px;margin-top:10px}
+.btn-teal{background:linear-gradient(135deg,var(--teal2),#00b894);color:#000;padding:13px 28px;box-shadow:0 0 28px rgba(15,244,198,.25)}
+.btn-teal:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(15,244,198,.4)}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--accent2);padding:12px 22px;border-radius:10px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+.btn-outline:hover{background:rgba(59,130,246,.1);border-color:var(--accent)}
+
+/* ═══════════════════════════════════
+   GLASS CARD
+═══════════════════════════════════ */
+.glass-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:32px;backdrop-filter:blur(20px);box-shadow:var(--shadow)}
+
+/* ═══════════════════════════════════
+   FORM
+═══════════════════════════════════ */
+.form-group{margin-bottom:20px}
+.form-label{font-size:.8rem;font-weight:500;color:var(--text2);margin-bottom:8px;display:block;text-transform:uppercase;letter-spacing:.5px}
+.form-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:border .2s}
+.form-input:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(96,165,250,.1)}
+select.form-input option{background:#0a1023}
+.gender-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gender-btn{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:11px;text-align:center;cursor:pointer;transition:.2s;font-size:.88rem;color:var(--text2)}
+.gender-btn.active,.gender-btn:hover{border-color:var(--accent2);background:rgba(59,130,246,.12);color:var(--accent2)}
+
+/* ═══════════════════════════════════
+   STEP HEADER
+═══════════════════════════════════ */
+.step-header{text-align:center;margin-bottom:36px}
+.step-num{font-size:.72rem;color:var(--violet);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.step-title{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-.5px}
+.step-desc{color:var(--text2);margin-top:6px;font-size:.92rem}
+
+/* ═══════════════════════════════════
+   LANDING
+═══════════════════════════════════ */
+#landing{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(59,130,246,.1) 0%,transparent 70%),var(--bg)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 40px;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-badge{font-size:.7rem;background:rgba(59,130,246,.12);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;color:var(--accent2)}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;min-height:calc(100vh - 68px);padding:50px 40px 40px;max-width:1280px;margin:0 auto}
+@media(max-width:880px){.hero{grid-template-columns:1fr;text-align:center;padding:36px 20px}}
+.hero-chip{display:inline-flex;align-items:center;gap:8px;font-size:.73rem;background:rgba(15,244,198,.08);border:1px solid rgba(15,244,198,.22);border-radius:20px;padding:5px 14px;color:var(--teal);margin-bottom:22px;letter-spacing:.5px;text-transform:uppercase}
+.hero-chip span{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:blink 1.4s infinite}
+.hero-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,4.5vw,3.6rem);font-weight:800;line-height:1.1;margin-bottom:18px;letter-spacing:-1.5px}
+.hero-title em{font-style:normal;background:linear-gradient(135deg,var(--accent2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-desc{font-size:1rem;color:var(--text2);line-height:1.7;max-width:480px;margin-bottom:32px}
+@media(max-width:880px){.hero-desc{margin:0 auto 32px}}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap}
+@media(max-width:880px){.cta-row{justify-content:center}}
+.stats-row{display:flex;gap:28px;margin-top:44px;flex-wrap:wrap}
+@media(max-width:880px){.stats-row{justify-content:center}}
+.stat-n{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--teal)}
+.stat-l{font-size:.78rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.hero-right{display:flex;justify-content:center;align-items:center}
+.eye-container{position:relative;width:360px;height:360px;display:flex;align-items:center;justify-content:center}
+@media(max-width:560px){.eye-container{width:260px;height:260px}}
+.eye-glow-ring{position:absolute;border-radius:50%;border:1px solid rgba(59,130,246,.28);animation:ringPulse 3s ease-in-out infinite}
+.r1{width:100%;height:100%}
+.r2{width:78%;height:78%;animation-delay:.5s;border-color:rgba(15,244,198,.18)}
+.r3{width:58%;height:58%;animation-delay:1s;border-color:rgba(168,85,247,.18)}
+.eye-svg-wrap{position:relative;z-index:2;width:210px;height:210px}
+@media(max-width:560px){.eye-svg-wrap{width:155px;height:155px}}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent);animation:scan 2.4s ease-in-out infinite;z-index:5;box-shadow:0 0 10px var(--teal)}
+.scan-corner{position:absolute;width:18px;height:18px;border-color:var(--teal);border-style:solid;opacity:.65}
+.sc-tl{top:8px;left:8px;border-width:2px 0 0 2px}
+.sc-tr{top:8px;right:8px;border-width:2px 2px 0 0}
+.sc-bl{bottom:8px;left:8px;border-width:0 0 2px 2px}
+.sc-br{bottom:8px;right:8px;border-width:0 2px 2px 0}
+.floating-badge{position:absolute;backdrop-filter:blur(12px);background:rgba(10,16,35,.82);border:1px solid var(--border);border-radius:10px;padding:7px 13px;font-size:.73rem;white-space:nowrap;animation:floatBadge 3s ease-in-out infinite}
+.fb1{top:8%;right:-5px;animation-delay:0s;color:var(--teal)}
+.fb2{bottom:12%;left:-16px;animation-delay:1s;color:var(--accent2)}
+.fb3{top:52%;right:-12px;animation-delay:2s;color:var(--violet)}
+.features{max-width:1280px;margin:0 auto;padding:52px 40px}
+@media(max-width:560px){.features{padding:36px 20px}}
+.section-label{font-size:.73rem;color:var(--accent2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;margin-bottom:36px;letter-spacing:-.5px}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.feature-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:26px;transition:.3s;cursor:default;position:relative;overflow:hidden}
+.feature-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(59,130,246,.05),transparent);opacity:0;transition:.3s}
+.feature-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:var(--shadow)}
+.feature-card:hover::before{opacity:1}
+.fc-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:14px}
+.fc-title{font-family:'Syne',sans-serif;font-weight:700;margin-bottom:6px}
+.fc-desc{font-size:.86rem;color:var(--text2);line-height:1.6}
+
+/* ═══════════════════════════════════
+   REGISTRATION
+═══════════════════════════════════ */
+#registration{background:radial-gradient(ellipse 60% 50% at 50% 50%,rgba(168,85,247,.07) 0%,transparent 70%),var(--bg2)}
+.reg-wrap{max-width:500px;margin:0 auto;padding:72px 20px}
+
+/* ═══════════════════════════════════
+   VISION TEST
+═══════════════════════════════════ */
+#vision-test{background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(59,130,246,.07),transparent),var(--bg)}
+.test-wrap{max-width:820px;margin:0 auto;padding:48px 20px}
+.snellen-progress{display:flex;gap:5px;margin-bottom:32px;align-items:flex-end}
+.sp-bar{flex:1;border-radius:4px 4px 0 0;transition:all .4s;cursor:pointer;position:relative}
+.sp-bar-label{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:.6rem;color:var(--text3);white-space:nowrap}
+.sp-bar.done{background:var(--teal);opacity:.7}
+.sp-bar.active{background:var(--accent);opacity:1;box-shadow:0 0 12px rgba(59,130,246,.5)}
+.sp-bar.future{background:rgba(255,255,255,.07)}
+.sp-bar.pass{background:var(--green);opacity:.8}
+.sp-bar.fail{background:var(--red);opacity:.7}
+.test-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:10px}
+.test-label-badge{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:.82rem;color:var(--text2)}
+.test-label-badge strong{color:var(--teal);font-family:'Syne',sans-serif}
+.eye-mode-toggle{display:flex;background:rgba(255,255,255,.04);border-radius:10px;padding:3px;border:1px solid var(--border);gap:3px}
+.em-btn{padding:7px 14px;border-radius:7px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:.8rem;font-family:'DM Sans',sans-serif;transition:.2s}
+.em-btn.active{background:var(--accent);color:#fff}
+.chart-box{background:#ffffff;border-radius:18px;padding:36px 28px;margin-bottom:22px;text-align:center;position:relative;overflow:hidden;min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px;box-shadow:0 4px 40px rgba(0,0,0,.5)}
+.chart-box-header{display:flex;justify-content:space-between;align-items:center;width:100%;margin-bottom:12px}
+.chart-acuity-label{font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;color:#1a1a2e;background:#eef2ff;border-radius:6px;padding:4px 10px}
+.chart-level-name{font-size:.72rem;color:#64748b;font-weight:500}
+.chart-eye-tag{font-size:.68rem;color:#3b82f6;background:#eff6ff;border-radius:5px;padding:3px 8px;font-weight:600}
+.chart-letter-row{display:flex;gap:0;justify-content:center;align-items:center;line-height:1;width:100%}
+.chart-letter-row span{font-family:'Syne',sans-serif;font-weight:800;color:#0f172a;letter-spacing:.05em;display:inline-block;transition:opacity .4s}
+.cl-r1 span{font-size:clamp(60px,12vw,88px)}
+.cl-r2 span{font-size:clamp(46px,9vw,68px)}
+.cl-r3 span{font-size:clamp(36px,7vw,52px)}
+.cl-r4 span{font-size:clamp(26px,5.5vw,40px)}
+.cl-r5 span{font-size:clamp(20px,4.2vw,30px)}
+.cl-r6 span{font-size:clamp(16px,3.2vw,23px)}
+.cl-r7 span{font-size:clamp(13px,2.6vw,19px)}
+.cl-r8 span{font-size:clamp(11px,2.2vw,16px)}
+.cl-r9 span{font-size:clamp(9px,1.8vw,13px)}
+.cl-r10 span{font-size:clamp(8px,1.5vw,11px)}
+.cl-r11 span{font-size:clamp(7px,1.3vw,9px)}
+.chart-letter-row.active-row span{color:#1e40af}
+.chart-letter-row.passed-row span{color:#15803d}
+.chart-letter-row.failed-row span{color:#dc2626}
+.timer-ring{position:relative;width:56px;height:56px;flex-shrink:0}
+.timer-svg{transform:rotate(-90deg)}
+.timer-track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:4}
+.timer-prog{fill:none;stroke:var(--teal);stroke-width:4;stroke-linecap:round;stroke-dasharray:157;transition:stroke-dashoffset .1s linear}
+.timer-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem}
+.answer-section{margin-bottom:20px}
+.answer-prompt{font-size:.82rem;color:var(--text2);margin-bottom:12px;text-align:center}
+.answer-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.answer-opt{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px 20px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;transition:.2s;color:var(--text);min-width:54px;text-align:center}
+.answer-opt:hover{border-color:var(--accent2);background:rgba(59,130,246,.12);color:var(--accent2)}
+.answer-opt.correct{border-color:var(--green);background:rgba(34,197,94,.14);color:var(--green)}
+.answer-opt.wrong{border-color:var(--red);background:rgba(239,68,68,.14);color:var(--red)}
+.instruction-box{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 18px;font-size:.83rem;color:var(--accent2);text-align:center;margin-bottom:18px}
+.test-complete-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:48px 32px;text-align:center}
+.check-circle{width:76px;height:76px;border-radius:50%;background:rgba(34,197,94,.12);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px;animation:ringPulse .8s ease 1}
+.complete-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--green);margin-bottom:8px}
+.complete-desc{color:var(--text2);font-size:.9rem;margin-bottom:6px}
+.result-table{width:100%;border-collapse:collapse;margin:24px 0;font-size:.82rem}
+.result-table th{color:var(--text3);text-transform:uppercase;font-size:.7rem;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
+.result-table td{padding:9px 10px;border-bottom:1px solid rgba(82,145,255,.08);color:var(--text2)}
+.result-table td:first-child{font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2)}
+.pass-cell{color:var(--green)!important;font-weight:600}
+.fail-cell{color:var(--red)!important;font-weight:600}
+.acuity-cell{color:var(--teal)!important;font-weight:700;font-family:'Syne',sans-serif}
+
+/* ═══════════════════════════════════
+   MIC PANEL
+═══════════════════════════════════ */
+.mic-panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:20px 22px;margin-bottom:18px;transition:.3s}
+.mic-panel.mic-active{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.04);box-shadow:0 0 28px rgba(239,68,68,.12)}
+.mic-panel.mic-heard{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.04);box-shadow:0 0 28px rgba(34,197,94,.12)}
+.mic-toprow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.mic-btn{width:54px;height:54px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;transition:.25s;position:relative;background:rgba(255,255,255,.06);border:2px solid var(--border)}
+.mic-btn:hover{transform:scale(1.05)}
+.mic-btn.listening{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.6);animation:micPulse 1.2s ease-in-out infinite}
+.mic-btn.heard{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.6)}
+.mic-btn-ring{position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(239,68,68,.4);animation:micRingOut 1.2s ease-out infinite;pointer-events:none;display:none}
+.mic-btn.listening .mic-btn-ring{display:block}
+.mic-info{flex:1;min-width:0}
+.mic-status{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:3px}
+.mic-hint{font-size:.78rem;color:var(--text3);line-height:1.4}
+.mic-mode-toggle{display:flex;background:rgba(255,255,255,.04);border-radius:8px;padding:3px;border:1px solid var(--border);gap:3px;flex-shrink:0}
+.mm-btn{padding:5px 12px;border-radius:5px;border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:.75rem;font-family:'DM Sans',sans-serif;transition:.2s;white-space:nowrap}
+.mm-btn.active{background:var(--accent);color:#fff}
+.mic-wave-wrap{margin-top:14px;border-radius:10px;overflow:hidden;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.05)}
+.mic-wave-wrap canvas{display:block;width:100%;height:52px}
+.mic-transcript{margin-top:12px;min-height:36px;display:flex;align-items:center;gap:10px}
+.mic-heard-letters{display:flex;gap:6px;flex-wrap:wrap}
+.mic-letter-chip{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.35);border-radius:7px;padding:5px 12px;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--accent2);animation:chipPop .2s ease}
+.mic-letter-chip.match{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);color:var(--green)}
+.mic-letter-chip.nomatch{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:var(--red)}
+.mic-raw{font-size:.8rem;color:var(--text3);font-style:italic}
+.mic-confirm-bar{display:none;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.mic-confirm-bar.show{display:flex}
+.mic-confirm-letters{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--teal);flex:1}
+.mic-confirm-hint{font-size:.78rem;color:var(--text2)}
+.input-or{display:flex;align-items:center;gap:10px;margin:14px 0 10px;font-size:.75rem;color:var(--text3)}
+.input-or::before,.input-or::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ═══════════════════════════════════
+   RESULTS
+═══════════════════════════════════ */
+#results{background:var(--bg)}
+.results-wrap{max-width:1080px;margin:0 auto;padding:52px 20px}
+.results-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;flex-wrap:wrap;gap:18px}
+.results-title{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:-.5px}
+.results-subtitle{color:var(--text2);margin-top:4px}
+.score-hero{background:linear-gradient(135deg,rgba(15,244,198,.09),rgba(59,130,246,.09));border:1px solid rgba(15,244,198,.22);border-radius:20px;padding:36px;display:flex;align-items:center;gap:36px;margin-bottom:24px;flex-wrap:wrap}
+.score-circle{position:relative;width:110px;height:110px;flex-shrink:0}
+.score-circle svg{transform:rotate(-90deg)}
+.score-circle-track{fill:none;stroke:rgba(255,255,255,.07);stroke-width:8}
+.score-circle-fill{fill:none;stroke:url(#scoreGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:339;stroke-dashoffset:339;transition:stroke-dashoffset 1.5s ease}
+.score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.score-big{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;line-height:1;color:var(--teal)}
+.score-label{font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.score-grade{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:5px}
+.score-desc{color:var(--text2);font-size:.9rem;line-height:1.6;max-width:480px}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-bottom:24px}
+.result-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:22px}
+.rc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.rc-title{font-size:.76rem;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+.rc-val{font-family:'Syne',sans-serif;font-weight:700;font-size:1.5rem;margin-bottom:3px}
+.rc-sub{font-size:.8rem;color:var(--text3)}
+.risk-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:10px}
+.risk-fill{height:100%;border-radius:3px}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:2px 9px;font-size:.72rem;font-weight:500}
+.badge-green{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+.badge-amber{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+.badge-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.badge-teal{background:rgba(15,244,198,.1);color:var(--teal);border:1px solid rgba(15,244,198,.25)}
+.chart-area{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:26px;margin-bottom:24px}
+.chart-area canvas{max-height:210px}
+.rec-list{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:26px;margin-bottom:24px}
+.rec-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.rec-item:last-child{border-bottom:none}
+.rec-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:7px}
+.rec-text{font-size:.9rem;color:var(--text2);line-height:1.55}
+.rec-text strong{color:var(--text)}
+.download-section{background:linear-gradient(135deg,rgba(15,244,198,.08),rgba(59,130,246,.08));border:1px solid rgba(15,244,198,.25);border-radius:16px;padding:28px;text-align:center;margin-top:24px}
+.download-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:6px}
+.download-desc{color:var(--text2);font-size:.88rem;margin-bottom:18px}
+.download-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ═══════════════════════════════════
+   UPLOAD
+═══════════════════════════════════ */
+#eye-upload{background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(15,244,198,.04) 0%,transparent 60%),var(--bg2)}
+.upload-wrap{max-width:660px;margin:0 auto;padding:52px 20px}
+.upload-zone{border:2px dashed rgba(82,145,255,.28);border-radius:18px;padding:52px 36px;text-align:center;cursor:pointer;transition:.3s;background:rgba(59,130,246,.02);position:relative}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--teal);background:rgba(15,244,198,.04);transform:scale(1.01)}
+.upload-icon{font-size:2.8rem;margin-bottom:14px}
+.upload-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:7px}
+.upload-desc{color:var(--text2);font-size:.88rem}
+.upload-input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.or-divider{display:flex;align-items:center;gap:14px;margin:20px 0;color:var(--text3);font-size:.83rem}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.camera-btn{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:13px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.92rem;display:flex;align-items:center;justify-content:center;gap:9px;transition:.2s}
+.camera-btn:hover{border-color:var(--accent2);color:var(--text)}
+.preview-area{margin-top:20px;border-radius:14px;overflow:hidden;border:1px solid var(--border);position:relative;display:none}
+.preview-img{width:100%;max-height:280px;object-fit:cover;display:block}
+.preview-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(4,6,15,.8),transparent);display:flex;align-items:flex-end;padding:18px}
+.preview-tag{background:rgba(15,244,198,.14);border:1px solid rgba(15,244,198,.28);border-radius:7px;padding:5px 11px;font-size:.75rem;color:var(--teal)}
+
+/* ═══════════════════════════════════
+   SCREEN SETTINGS — FULLY REBUILT
+═══════════════════════════════════ */
+#screen-settings{background:radial-gradient(ellipse 60% 50% at 80% 50%,rgba(168,85,247,.06),transparent),var(--bg2)}
+.ss-wrap{max-width:1060px;margin:0 auto;padding:52px 20px}
+
+/* Report summary card */
+.ss-report-card{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:22px}
+.ss-report-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.ss-report-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem}
+.ss-report-sub{font-size:.8rem;color:var(--text3);margin-top:3px}
+.ss-metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.ss-metric{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.ss-metric-label{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.ss-metric-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;margin-bottom:2px}
+.ss-metric-sub{font-size:.72rem;color:var(--text3)}
+.mv-teal{color:var(--teal)}
+.mv-amber{color:var(--amber)}
+.mv-blue{color:var(--accent2)}
+.mv-red{color:var(--red)}
+.mv-green{color:var(--green)}
+.mv-violet{color:var(--violet)}
+
+/* Live preview strip */
+.ss-preview-strip{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:16px;padding:18px 22px;margin-bottom:22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.ss-preview-swatch{width:220px;min-height:68px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,.1);transition:all .3s;padding:12px 18px;text-align:center}
+.ss-preview-meta{flex:1;min-width:180px}
+.ss-preview-meta-title{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.ss-preview-tags{display:flex;flex-wrap:wrap;gap:7px}
+.ss-ptag{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:.75rem}
+.ss-ptag strong{color:var(--accent2)}
+
+/* Settings grid */
+.ss-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:22px}
+.ss-card{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:22px;transition:.3s}
+.ss-card:hover{border-color:var(--border2)}
+.ss-card-top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.ss-card-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0}
+.ss-card-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem}
+.ss-card-desc{font-size:.74rem;color:var(--text3);margin-top:2px}
+.ss-slider-val{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--accent2);text-align:right;margin-bottom:5px}
+.ss-slider{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;margin:6px 0 8px}
+.ss-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;cursor:pointer;border:2px solid var(--bg)}
+.ss-slider-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--text3)}
+.ss-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid var(--border)}
+.ss-toggle-label{font-size:.84rem;color:var(--text2)}
+.ss-toggle{position:relative;width:44px;height:24px}
+.ss-toggle input{opacity:0;width:0;height:0;position:absolute}
+.ss-toggle-sl{position:absolute;inset:0;background:rgba(255,255,255,.1);border-radius:12px;cursor:pointer;transition:.3s;border:1px solid var(--border)}
+.ss-toggle-sl::before{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.3s}
+.ss-toggle input:checked+.ss-toggle-sl{background:var(--accent)}
+.ss-toggle input:checked+.ss-toggle-sl::before{transform:translateX(20px)}
+
+/* Color temperature picker */
+.ss-ct-row{display:flex;gap:6px;margin-top:14px}
+.ss-ct-btn{flex:1;padding:9px 6px;font-size:.72rem;border:1px solid var(--border);border-radius:9px;background:rgba(255,255,255,.03);color:var(--text3);cursor:pointer;text-align:center;transition:.2s;line-height:1.4}
+.ss-ct-btn:hover{border-color:var(--border2);color:var(--text2)}
+.ss-ct-btn.active{border-color:var(--accent2);background:rgba(59,130,246,.14);color:var(--accent2)}
+.ss-ct-dot{display:block;width:10px;height:10px;border-radius:50%;margin:0 auto 6px}
+
+/* Apply bar */
+.ss-apply-bar{background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(15,244,198,.07));border:1px solid rgba(59,130,246,.3);border-radius:18px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px;flex-wrap:wrap}
+.ss-apply-text{}
+.ss-apply-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.05rem;margin-bottom:4px}
+.ss-apply-sub{font-size:.83rem;color:var(--text2)}
+.ss-apply-btns{display:flex;gap:10px;flex-wrap:wrap}
+.ss-btn-apply{background:linear-gradient(135deg,var(--accent),#1d4ed8);color:#fff;border:none;border-radius:11px;padding:11px 24px;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:.25s;box-shadow:0 0 22px rgba(59,130,246,.3);display:flex;align-items:center;gap:7px}
+.ss-btn-apply:hover{transform:translateY(-2px);box-shadow:0 0 36px rgba(59,130,246,.5)}
+.ss-btn-apply:active{transform:scale(.97)}
+.ss-btn-sec{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2);border-radius:11px;padding:11px 18px;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:7px}
+.ss-btn-sec:hover{border-color:var(--border2);color:var(--text);background:rgba(255,255,255,.07)}
+
+/* Export panel */
+.ss-export-panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:22px;display:none}
+.ss-export-panel.open{display:block}
+.ss-export-title{font-size:.76rem;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px}
+.ss-export-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.ss-export-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:18px 14px;cursor:pointer;text-align:center;transition:.3s}
+.ss-export-card:hover{border-color:var(--border2);background:rgba(255,255,255,.06);transform:translateY(-2px)}
+.ss-export-card:active{transform:scale(.97)}
+.ss-ec-icon{font-size:1.8rem;margin-bottom:10px}
+.ss-ec-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;margin-bottom:4px}
+.ss-ec-desc{font-size:.72rem;color:var(--text3);line-height:1.5}
+.ss-ec-badge{display:inline-block;font-size:.62rem;background:rgba(59,130,246,.15);border:1px solid var(--border2);color:var(--accent2);border-radius:4px;padding:2px 6px;margin-top:5px}
+
+/* What it applies info */
+.ss-info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:22px}
+.ss-info-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+.ss-info-icon{font-size:1.2rem;margin-bottom:8px}
+.ss-info-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:5px}
+.ss-info-desc{font-size:.78rem;color:var(--text3);line-height:1.55}
+.ss-info-badge{font-size:.68rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:var(--green);border-radius:5px;padding:2px 8px;margin-top:6px;display:inline-block}
+.ss-info-badge-y{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2);color:var(--amber)}
+
+/* Toast */
+.ss-toast{position:fixed;bottom:28px;right:28px;background:linear-gradient(135deg,#0f6e56,#185fa5);color:#fff;padding:12px 20px;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;transform:translateY(70px);opacity:0;transition:.35s;z-index:9999;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px}
+.ss-toast.show{transform:translateY(0);opacity:1}
+
+/* Final CTA */
+.ss-final{text-align:center;padding:32px;background:var(--panel);border:1px solid var(--border);border-radius:20px;margin-top:8px}
+
+/* ═══════════════════════════════════
+   ANALYZING OVERLAY
+═══════════════════════════════════ */
+.analyzing-overlay{position:fixed;inset:0;background:rgba(4,6,15,.92);backdrop-filter:blur(12px);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.analyzing-overlay.show{display:flex}
+.analyze-ring{width:110px;height:110px;border-radius:50%;border:3px solid rgba(59,130,246,.15);border-top-color:var(--teal);animation:spin 1s linear infinite;box-shadow:0 0 36px rgba(15,244,198,.18)}
+.analyze-text{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700}
+.analyze-sub{color:var(--text2);font-size:.88rem}
+.analyze-dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--teal);margin:0 3px;animation:dotBounce .8s ease-in-out infinite}
+.analyze-dots span:nth-child(2){animation-delay:.2s}
+.analyze-dots span:nth-child(3){animation-delay:.4s}
+
+/* ═══════════════════════════════════
+   MODAL
+═══════════════════════════════════ */
+.modal{position:fixed;inset:0;background:rgba(4,6,15,.92);backdrop-filter:blur(12px);z-index:300;display:none;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:30px;max-width:480px;width:90%;text-align:center}
+.modal-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;margin-bottom:6px}
+.modal-desc{color:var(--text2);font-size:.86rem;margin-bottom:20px}
+#cameraVideo{width:100%;border-radius:10px;background:#000;margin-bottom:14px;max-height:260px}
+.modal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* ═══════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════ */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes ringPulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.8;transform:scale(1.03)}}
+@keyframes scan{0%{top:12%;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:88%;opacity:0}}
+@keyframes floatBadge{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes dotBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
+@keyframes micRingOut{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.6);opacity:0}}
+@keyframes chipPop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.fade-in{animation:fadeIn .5s ease forwards}
+
+@media(max-width:600px){
+  .results-header,.ss-apply-bar{flex-direction:column}
+  .score-hero{flex-direction:column;align-items:flex-start}
+  .page-nav,.nav{padding:14px 16px}
+  .ss-apply-btns{width:100%}
+  .ss-btn-apply,.ss-btn-sec{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ LANDING ═══════ -->
+<div id="landing" class="page active">
+  <nav class="nav">
+    <div class="logo">NeuroVision AI</div>
+    <div class="nav-badge">🔬 AI-Powered</div>
+  </nav>
+  <section class="hero">
+    <div class="hero-left fade-in">
+      <div class="hero-chip"><span></span>Real-Time Vision Intelligence</div>
+      <h1 class="hero-title">AI Vision Analysis &<br/><em>Smart Screen</em><br/>Optimization</h1>
+      <p class="hero-desc">Clinical-grade Snellen chart testing across 11 acuity levels (0.25 → 6.0). Get your vision score, risk analysis, and custom screen recommendations.</p>
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="goTo('registration')">▶ Start Vision Scan</button>
+        <button class="btn btn-ghost">Learn More</button>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-n">98.4%</div><div class="stat-l">Accuracy</div></div>
+        <div class="stat"><div class="stat-n">11</div><div class="stat-l">Acuity Levels</div></div>
+        <div class="stat"><div class="stat-n">&lt;5min</div><div class="stat-l">Full Report</div></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="eye-container">
+        <div class="eye-glow-ring r1"></div>
+        <div class="eye-glow-ring r2"></div>
+        <div class="eye-glow-ring r3"></div>
+        <div class="eye-svg-wrap">
+          <div class="scan-corner sc-tl"></div><div class="scan-corner sc-tr"></div>
+          <div class="scan-corner sc-bl"></div><div class="scan-corner sc-br"></div>
+          <div class="scan-line"></div>
+          <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+            <defs>
+              <radialGradient id="irisGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#1e3a5f"/><stop offset="40%" stop-color="#1a4080"/><stop offset="70%" stop-color="#0d2d6b"/><stop offset="100%" stop-color="#071840"/></radialGradient>
+              <radialGradient id="pupilGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#000"/><stop offset="100%" stop-color="#0a0a1a"/></radialGradient>
+            </defs>
+            <ellipse cx="110" cy="110" rx="95" ry="68" fill="#f0ece8"/>
+            <ellipse cx="110" cy="110" rx="95" ry="68" fill="none" stroke="#d4c8be" stroke-width="1.5"/>
+            <circle cx="110" cy="110" r="52" fill="url(#irisGrad)"/>
+            <g opacity="0.3" stroke="#4a7abf" stroke-width="0.8" fill="none">
+              <circle cx="110" cy="110" r="45"/><circle cx="110" cy="110" r="38"/>
+              <line x1="110" y1="58" x2="110" y2="162"/><line x1="58" y1="110" x2="162" y2="110"/>
+              <line x1="73" y1="73" x2="147" y2="147"/><line x1="147" y1="73" x2="73" y2="147"/>
+            </g>
+            <circle cx="110" cy="110" r="26" fill="url(#pupilGrad)"/>
+            <circle cx="95" cy="96" r="8" fill="white" opacity="0.7"/>
+            <circle cx="118" cy="120" r="4" fill="white" opacity="0.3"/>
+            <g opacity="0.15" stroke="#c0392b" stroke-width="0.8" fill="none">
+              <path d="M20,95 Q50,100 75,108"/><path d="M200,115 Q170,112 145,110"/>
+              <path d="M30,120 Q60,118 80,112"/>
+            </g>
+            <path d="M15,110 Q60,55 110,52 Q160,55 205,110" fill="none" stroke="#8a7060" stroke-width="2.5"/>
+            <path d="M15,110 Q60,165 110,168 Q160,165 205,110" fill="none" stroke="#8a7060" stroke-width="2"/>
+            <g stroke="#2d1f14" stroke-width="1.2" stroke-linecap="round" opacity="0.8">
+              <line x1="35" y1="90" x2="28" y2="80"/><line x1="55" y1="70" x2="50" y2="59"/>
+              <line x1="80" y1="57" x2="77" y2="45"/><line x1="110" y1="52" x2="110" y2="40"/>
+              <line x1="140" y1="57" x2="143" y2="45"/><line x1="165" y1="70" x2="170" y2="59"/>
+              <line x1="185" y1="90" x2="192" y2="80"/>
+            </g>
+            <circle cx="110" cy="110" r="52" fill="none" stroke="rgba(15,244,198,0.35)" stroke-width="1" stroke-dasharray="8 4" opacity="0.6">
+              <animateTransform attributeName="transform" type="rotate" from="0 110 110" to="360 110 110" dur="8s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+        <div class="floating-badge fb1">👁 Iris analyzed</div>
+        <div class="floating-badge fb2">📊 Vision 20/20</div>
+        <div class="floating-badge fb3">🔵 No anomalies</div>
+      </div>
+    </div>
+  </section>
+  <section class="features">
+    <div class="section-label">What We Offer</div>
+    <div class="section-title">Complete Vision Intelligence Suite</div>
+    <div class="feature-grid">
+      <div class="feature-card"><div class="fc-icon" style="background:rgba(15,244,198,.1)">📊</div><div class="fc-title">11-Level Snellen Test</div><div class="fc-desc">Full acuity range 0.25 → 6.0, each with its own authentic chart layout and letter set.</div></div>
+      <div class="feature-card"><div class="fc-icon" style="background:rgba(59,130,246,.1)">👁</div><div class="fc-title">Eye Image Analysis</div><div class="fc-desc">Upload or capture your eye. AI detects redness, dryness, and vascular anomalies.</div></div>
+      <div class="feature-card"><div class="fc-icon" style="background:rgba(168,85,247,.1)">📋</div><div class="fc-title">Download Report</div><div class="fc-desc">Get a detailed PDF/text report with all acuity results and personalized recommendations.</div></div>
+      <div class="feature-card"><div class="fc-icon" style="background:rgba(245,158,11,.1)">🖥</div><div class="fc-title">Screen Optimizer</div><div class="fc-desc">Auto-tuned brightness, font size, blue light, zoom, and dark mode recommendations.</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════ REGISTRATION ═══════ -->
+<div id="registration" class="page">
+  <nav class="page-nav">
+    <button class="back-btn" onclick="goTo('landing')">← Back</button>
+    <div class="logo">NeuroVision AI</div>
+    <div class="page-steps"><div class="ps-dot active"></div><div class="ps-dot"></div><div class="ps-dot"></div><div class="ps-dot"></div></div>
+  </nav>
+  <div class="reg-wrap">
+    <div class="step-header">
+      <div class="step-num">Step 1 of 4</div>
+      <div class="step-title">Patient Profile</div>
+      <div class="step-desc">We personalize your vision analysis based on your profile.</div>
+    </div>
+    <div class="glass-card">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" id="userName" placeholder="Enter your name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Age</label>
+        <input type="number" class="form-input" id="userAge" placeholder="Your age" min="5" max="100"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gender</label>
+        <div class="gender-row">
+          <div class="gender-btn" onclick="selectGender(this,'Male')">♂ Male</div>
+          <div class="gender-btn" onclick="selectGender(this,'Female')">♀ Female</div>
+          <div class="gender-btn" onclick="selectGender(this,'Other')">⚧ Other</div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="startVisionTest()">Continue to Vision Test →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ VISION TEST ═══════ -->
+<div id="vision-test" class="page">
+  <nav class="page-nav">
+    <button class="back-btn" onclick="goTo('registration')">← Back</button>
+    <div class="logo">NeuroVision AI</div>
+    <div class="page-steps"><div class="ps-dot done"></div><div class="ps-dot active"></div><div class="ps-dot"></div><div class="ps-dot"></div></div>
+  </nav>
+  <div class="test-wrap">
+    <div class="step-header" style="margin-bottom:24px">
+      <div class="step-num">Step 2 of 4 — Snellen Vision Test</div>
+      <div class="step-title" id="chartTitle">Acuity Level 0.25</div>
+      <div class="step-desc">Sit 50 cm from screen. Cover one eye if in single-eye mode. Select the letter shown in the highlighted row.</div>
+    </div>
+    <div class="snellen-progress" id="snellenProgress"></div>
+    <div style="height:28px"></div>
+    <div class="test-topbar">
+      <div class="test-label-badge">Level <strong id="levelNum">1</strong>/11 &nbsp;·&nbsp; <strong id="acuityTag">0.25</strong></div>
+      <div class="timer-ring">
+        <svg class="timer-svg" width="56" height="56" viewBox="0 0 56 56">
+          <circle class="timer-track" cx="28" cy="28" r="25"/>
+          <circle class="timer-prog" id="timerRing" cx="28" cy="28" r="25"/>
+        </svg>
+        <div class="timer-text" id="timerText">12</div>
+      </div>
+      <div class="eye-mode-toggle">
+        <button class="em-btn active" onclick="setEyeMode('both',this)">Both</button>
+        <button class="em-btn" onclick="setEyeMode('left',this)">Left</button>
+        <button class="em-btn" onclick="setEyeMode('right',this)">Right</button>
+      </div>
+    </div>
+    <div class="instruction-box" id="eyeInstruction">👁 Both Eyes Open — Read the highlighted row</div>
+    <div class="chart-box" id="chartBox"></div>
+    <div class="mic-panel" id="micPanel">
+      <div class="mic-toprow">
+        <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Toggle microphone">
+          <span id="micIcon">🎙</span>
+          <div class="mic-btn-ring"></div>
+        </button>
+        <div class="mic-info">
+          <div class="mic-status" id="micStatus">Microphone Off</div>
+          <div class="mic-hint" id="micHint">Click 🎙 to speak your answer — say the letter(s) you see in the highlighted row</div>
+        </div>
+        <div class="mic-mode-toggle">
+          <button class="mm-btn active" id="mmContinuous" onclick="setMicMode('continuous',this)">🔁 Auto</button>
+          <button class="mm-btn" id="mmHold" onclick="setMicMode('hold',this)">⏺ Hold</button>
+        </div>
+      </div>
+      <div class="mic-wave-wrap"><canvas id="micWaveCanvas" height="52"></canvas></div>
+      <div class="mic-transcript">
+        <div class="mic-raw" id="micRaw">Waiting for speech...</div>
+        <div class="mic-heard-letters" id="micHeardLetters"></div>
+      </div>
+      <div class="mic-confirm-bar" id="micConfirmBar">
+        <div class="mic-confirm-letters" id="micConfirmLetters"></div>
+        <div class="mic-confirm-hint">Say "confirm" or click ✓ to submit</div>
+        <button class="btn btn-primary" style="padding:8px 18px;font-size:.82rem" onclick="confirmMicAnswer()">✓ Submit</button>
+        <button class="btn-outline" style="padding:8px 14px;font-size:.78rem" onclick="clearMicAnswer()">✕ Clear</button>
+      </div>
+    </div>
+    <div class="answer-section">
+      <div class="input-or">or select manually</div>
+      <div class="answer-prompt">Select the letter(s) in the highlighted row:</div>
+      <div class="answer-grid" id="answerGrid"></div>
+    </div>
+    <div id="testComplete" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══════ EYE UPLOAD ═══════ -->
+<div id="eye-upload" class="page">
+  <nav class="page-nav">
+    <button class="back-btn" onclick="goTo('vision-test')">← Back</button>
+    <div class="logo">NeuroVision AI</div>
+    <div class="page-steps"><div class="ps-dot done"></div><div class="ps-dot done"></div><div class="ps-dot active"></div><div class="ps-dot"></div></div>
+  </nav>
+  <div class="upload-wrap">
+    <div class="step-header">
+      <div class="step-num">Step 3 of 4</div>
+      <div class="step-title">Eye Image Analysis</div>
+      <div class="step-desc">Upload a close-up photo of your eye for AI health screening.</div>
+    </div>
+    <div class="glass-card">
+      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" class="upload-input" accept="image/*" onchange="handleFile(event)"/>
+        <div class="upload-icon">👁</div>
+        <div class="upload-title">Drop your eye image here</div>
+        <div class="upload-desc">PNG, JPG up to 10MB — or click to browse</div>
+      </div>
+      <div class="or-divider">or</div>
+      <button class="camera-btn" onclick="openCamera()">📷 Capture with Camera</button>
+      <div class="preview-area" id="previewArea">
+        <img id="previewImg" class="preview-img" src="" alt="Eye preview"/>
+        <div class="preview-overlay"><span class="preview-tag">✓ Image ready for analysis</span></div>
+      </div>
+      <button class="btn btn-primary btn-full" style="margin-top:18px" onclick="startAnalysis()">🔬 Analyze Eye Image →</button>
+      <div style="text-align:center;margin-top:12px">
+        <button class="btn-outline" onclick="skipUpload()" style="font-size:.8rem;padding:9px 18px">Skip — Go to Results →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ RESULTS ═══════ -->
+<div id="results" class="page">
+  <nav class="page-nav">
+    <button class="back-btn" onclick="goTo('eye-upload')">← Back</button>
+    <div class="logo">NeuroVision AI</div>
+    <div class="page-steps"><div class="ps-dot done"></div><div class="ps-dot done"></div><div class="ps-dot done"></div><div class="ps-dot active"></div></div>
+  </nav>
+  <div class="results-wrap">
+    <div class="results-header">
+      <div>
+        <div class="results-title">Vision Health Report</div>
+        <div class="results-subtitle" id="patientLabel">Analysis complete</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn-outline" onclick="downloadReport()">⬇ Download Report</button>
+        <button class="btn btn-primary" onclick="goTo('screen-settings')">🖥 Screen Settings →</button>
+      </div>
+    </div>
+    <div class="score-hero">
+      <div class="score-circle">
+        <svg width="110" height="110" viewBox="0 0 110 110">
+          <defs><linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0ff4c6"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs>
+          <circle class="score-circle-track" cx="55" cy="55" r="54"/>
+          <circle class="score-circle-fill" id="scoreFill" cx="55" cy="55" r="54"/>
+        </svg>
+        <div class="score-num"><span class="score-big" id="scoreNum">0</span><span class="score-label">Score</span></div>
+      </div>
+      <div>
+        <div class="score-grade" id="scoreGrade">Excellent</div>
+        <div class="score-desc" id="scoreDesc">Loading...</div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap" id="acuityBadges"></div>
+      </div>
+    </div>
+    <div class="result-card" style="margin-bottom:24px">
+      <div class="rc-header" style="margin-bottom:16px"><span class="rc-title" style="font-size:.85rem">Snellen Chart Results — All 11 Levels</span><span class="badge badge-teal" id="passCount">—</span></div>
+      <div style="overflow-x:auto">
+        <table class="result-table" id="snellenTable">
+          <thead><tr><th>Acuity</th><th>Level Name</th><th>Letters</th><th>Your Answer</th><th>Result</th><th>20/x</th></tr></thead>
+          <tbody id="snellenTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="rc-header"><span class="rc-title">Best Acuity</span><span class="badge badge-teal" id="bestAcuityBadge">—</span></div>
+        <div class="rc-val" id="bestAcuityVal">—</div>
+        <div class="rc-sub">Highest level passed</div>
+        <div class="risk-bar"><div class="risk-fill" id="bestBar" style="background:var(--teal)"></div></div>
+      </div>
+      <div class="result-card">
+        <div class="rc-header"><span class="rc-title">Eye Strain Risk</span><span class="badge badge-amber">Moderate</span></div>
+        <div class="rc-val" id="strainVal">—</div>
+        <div class="rc-sub">Based on test & age</div>
+        <div class="risk-bar"><div class="risk-fill" id="strainBar" style="background:var(--amber)"></div></div>
+      </div>
+      <div class="result-card">
+        <div class="rc-header"><span class="rc-title">Levels Passed</span><span class="badge badge-green" id="passRateBadge">—</span></div>
+        <div class="rc-val" id="passRateVal">—</div>
+        <div class="rc-sub">out of 11 levels</div>
+        <div class="risk-bar"><div class="risk-fill" id="passBar" style="background:var(--green)"></div></div>
+      </div>
+      <div class="result-card">
+        <div class="rc-header"><span class="rc-title">Blue Light Exposure</span><span class="badge badge-amber">Elevated</span></div>
+        <div class="rc-val" id="blueVal">—</div>
+        <div class="rc-sub">Recommend filter</div>
+        <div class="risk-bar"><div class="risk-fill" id="blueBar" style="background:var(--violet)"></div></div>
+      </div>
+    </div>
+    <div class="chart-area">
+      <div class="rc-title" style="margin-bottom:14px;font-size:.85rem">Vision Acuity Profile — All Levels</div>
+      <canvas id="acuityChart"></canvas>
+    </div>
+    <div class="rec-list">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:3px">Personalized Recommendations</div>
+      <div style="font-size:.8rem;color:var(--text2);margin-bottom:4px" id="recContext"></div>
+      <div class="rec-item"><div class="rec-dot" style="background:var(--teal)"></div><div class="rec-text" id="rec1"><strong>20-20-20 Rule:</strong> Every 20 minutes, look 20 feet away for 20 seconds.</div></div>
+      <div class="rec-item"><div class="rec-dot" style="background:var(--accent)"></div><div class="rec-text" id="rec2"><strong>Blue Light Filter:</strong> Enable protection during evening hours.</div></div>
+      <div class="rec-item"><div class="rec-dot" style="background:var(--violet)"></div><div class="rec-text"><strong>Screen Distance:</strong> Maintain 50–70 cm from your display.</div></div>
+      <div class="rec-item"><div class="rec-dot" style="background:var(--amber)"></div><div class="rec-text" id="rec4"><strong>Annual Checkup:</strong> Schedule an in-person optometrist visit.</div></div>
+    </div>
+    <div class="download-section">
+      <div class="download-title">📄 Download Your Vision Report</div>
+      <div class="download-desc">Complete report with all 11 Snellen levels, acuity scores, risk analysis, and personalized recommendations.</div>
+      <div class="download-btns">
+        <button class="btn btn-teal" onclick="downloadReport()">⬇ Download TXT Report</button>
+        <button class="btn-outline" onclick="goTo('screen-settings')">🖥 View Screen Settings</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SCREEN SETTINGS — FULLY REBUILT ═══════ -->
+<div id="screen-settings" class="page">
+  <nav class="page-nav">
+    <button class="back-btn" onclick="goTo('results')">← Results</button>
+    <div class="logo">NeuroVision AI</div>
+    <div class="nav-badge">✓ Analysis Complete</div>
+  </nav>
+  <div class="ss-wrap">
+    <div class="step-header" style="text-align:left;margin-bottom:28px">
+      <div class="step-num">Step 4 of 4 — Smart Screen Optimizer</div>
+      <div class="step-title">Recommended Display Settings</div>
+      <div class="step-desc">Auto-tuned from your Snellen test results. Adjust below, then apply to your system.</div>
+    </div>
+
+    <!-- Vision Summary Report -->
+    <div class="ss-report-card">
+      <div class="ss-report-top">
+        <div>
+          <div class="ss-report-title">Vision Test Summary</div>
+          <div class="ss-report-sub" id="ssPatientLabel">Report for patient</div>
+        </div>
+        <button class="btn-outline" style="font-size:.78rem;padding:8px 14px" onclick="downloadReport()">⬇ Full Report</button>
+      </div>
+      <div class="ss-metrics-grid">
+        <div class="ss-metric"><div class="ss-metric-label">Overall Score</div><div class="ss-metric-val mv-teal" id="ssOverall">—</div><div class="ss-metric-sub">out of 100</div></div>
+        <div class="ss-metric"><div class="ss-metric-label">Best Acuity</div><div class="ss-metric-val mv-blue" id="ssBestAcuity">—</div><div class="ss-metric-sub" id="ssBestFraction">—</div></div>
+        <div class="ss-metric"><div class="ss-metric-label">Levels Passed</div><div class="ss-metric-val mv-green" id="ssPassed">—</div><div class="ss-metric-sub">out of 11</div></div>
+        <div class="ss-metric"><div class="ss-metric-label">Eye Strain</div><div class="ss-metric-val mv-amber" id="ssStrain">—</div><div class="ss-metric-sub">risk index</div></div>
+        <div class="ss-metric"><div class="ss-metric-label">Dryness</div><div class="ss-metric-val mv-red" id="ssDryness">—</div><div class="ss-metric-sub">index</div></div>
+        <div class="ss-metric"><div class="ss-metric-label">Blue Light</div><div class="ss-metric-val mv-violet" id="ssBlueExp">—</div><div class="ss-metric-sub">exposure</div></div>
+      </div>
+    </div>
+
+    <!-- Live Preview Strip -->
+    <div class="ss-preview-strip">
+      <div class="ss-preview-swatch" id="ssPreviewSwatch">
+        <span id="ssPreviewText" style="font-weight:600;transition:all .3s">Sample Text Preview</span>
+      </div>
+      <div class="ss-preview-meta">
+        <div class="ss-preview-meta-title">Live Preview — adjusts as you change settings</div>
+        <div class="ss-preview-tags" id="ssPreviewTags">
+          <div class="ss-ptag"><strong>Brightness</strong> 48%</div>
+          <div class="ss-ptag"><strong>Font</strong> 16px</div>
+          <div class="ss-ptag"><strong>Zoom</strong> 110%</div>
+          <div class="ss-ptag"><strong>Blue filter</strong> 65%</div>
+          <div class="ss-ptag"><strong>Contrast</strong> Medium</div>
+          <div class="ss-ptag"><strong>Temp</strong> D65</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Sliders Grid -->
+    <div class="ss-grid">
+
+      <!-- Brightness -->
+      <div class="ss-card">
+        <div class="ss-card-top">
+          <div class="ss-card-icon" style="background:rgba(245,158,11,.12)">☀️</div>
+          <div><div class="ss-card-name">Brightness</div><div class="ss-card-desc">Reduce fatigue in low light</div></div>
+        </div>
+        <div class="ss-slider-val" id="vBright">48%</div>
+        <input type="range" class="ss-slider" id="sBright" min="10" max="100" value="48" step="1" style="accent-color:var(--amber)" oninput="ssUpdate()"/>
+        <div class="ss-slider-labels"><span>Dim (10%)</span><span>Bright (100%)</span></div>
+      </div>
+
+      <!-- Font Size -->
+      <div class="ss-card">
+        <div class="ss-card-top">
+          <div class="ss-card-icon" style="background:rgba(59,130,246,.12)">🔤</div>
+          <div><div class="ss-card-name">Font Size</div><div class="ss-card-desc">Boost readability</div></div>
+        </div>
+        <div class="ss-slider-val" id="vFont">16px</div>
+        <input type="range" class="ss-slider" id="sFont" min="12" max="26" value="16" step="1" style="accent-color:var(--accent)" oninput="ssUpdate()"/>
+        <div class="ss-slider-labels"><span>12px</span><span>26px</span></div>
+      </div>
+
+      <!-- Blue Light Filter -->
+      <div class="ss-card">
+        <div class="ss-card-top">
+          <div class="ss-card-icon" style="background:rgba(168,85,247,.12)">🔵</div>
+          <div><div class="ss-card-name">Blue Light Filter</div><div class="ss-card-desc">Protect retina — evening use</div></div>
+        </div>
+        <div class="ss-slider-val" id="vBlue">65%</div>
+        <input type="range" class="ss-slider" id="sBlue" min="0" max="100" value="65" step="1" style="accent-color:var(--violet)" oninput="ssUpdate()"/>
+        <div class="ss-slider-labels"><span>Off (0%)</span><span>Max (100%)</span></div>
+      </div>
+
+      <!-- Display Zoom -->
+      <div class="ss-card">
+        <div class="ss-card-top">
+          <div class="ss-card-icon" style="background:rgba(15,244,198,.12)">🔍</div>
+          <div><div class="ss-card-name">Display Zoom</div><div class="ss-card-desc">Magnification / DPI scaling</div></div>
+        </div>
+        <div class="ss-slider-val" id="vZoom">110%</div>
+        <input type="range" class="ss-slider" id="sZoom" min="75" max="150" value="110" step="5" style="accent-color:var(--teal)" oninput="ssUpdate()"/>
+        <div class="ss-slider-labels"><span>75%</span><span>150%</span></div>
+      </div>
+
+      <!-- Contrast -->
+      <div class="ss-card">
+        <div class="ss-card-top">
+          <div class="ss-card-icon" style="background:rgba(34,197,94,.12)">◐</div>
+          <div><div class="ss-card-name">Contrast</div><div class="ss-card-desc">Text sharpness & clarity</div></div>
+        </div>
+        <div class="ss-slider-val" id="vContrast">Medium</div>
+        <input type="range" class="ss-slider" id="sContrast" min="1" max="3" value="2" step="1" style="accent-color:var(--green)" oninput="ssUpdate()"/>
+        <div class="ss-slider-labels"><span>Low</span><span>High</span></div>
+        <div class="ss-toggle-row">
+          <span class="ss-toggle-label">Wide text spacing</span>
+          <label class="ss-toggle"><input type="checkbox" id="tSpacing" checked onchange="ssUpdate()"><span class="ss-toggle-sl"></span></label>
+        </div>
+      </div>
+
+      <!-- Dark Mode & Color Temp -->
+      <div class="ss-card">
+        <div class="ss-card-top">
+          <div class="ss-card-icon" style="background:rgba(148,163,184,.1)">🌙</div>
+          <div><div class="ss-card-name">Dark Mode & Color Temp</div><div class="ss-card-desc">Appearance & warmth</div></div>
+        </div>
+        <div class="ss-toggle-row" style="border-top:none;padding-top:0">
+          <span class="ss-toggle-label">System dark mode</span>
+          <label class="ss-toggle"><input type="checkbox" id="tDark" checked onchange="ssUpdate()"><span class="ss-toggle-sl"></span></label>
+        </div>
+        <div class="ss-toggle-row">
+          <span class="ss-toggle-label">Auto-switch at sunset</span>
+          <label class="ss-toggle"><input type="checkbox" id="tAuto" onchange="ssUpdate()"><span class="ss-toggle-sl"></span></label>
+        </div>
+        <div class="ss-toggle-row">
+          <span class="ss-toggle-label">High contrast text</span>
+          <label class="ss-toggle"><input type="checkbox" id="tHighContrast" onchange="ssUpdate()"><span class="ss-toggle-sl"></span></label>
+        </div>
+        <div class="ss-ct-row">
+          <div class="ss-ct-btn active" id="ctD65" onclick="setCT('D65',this)"><span class="ss-ct-dot" style="background:#fff8e8"></span>D65<br><small>Daylight</small></div>
+          <div class="ss-ct-btn" id="ctWarm" onclick="setCT('Warm',this)"><span class="ss-ct-dot" style="background:#ffd9a0"></span>Warm<br><small>3000K</small></div>
+          <div class="ss-ct-btn" id="ctNight" onclick="setCT('Night',this)"><span class="ss-ct-dot" style="background:#ffb566"></span>Night<br><small>2700K</small></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- What Each Action Does -->
+    <div class="ss-info-grid">
+      <div class="ss-info-card">
+        <div class="ss-info-icon">🌐</div>
+        <div class="ss-info-title">Apply to Page</div>
+        <div class="ss-info-desc">Instantly applies brightness, blue filter, contrast, font size, and zoom to this entire web app using CSS filters and variables.</div>
+        <div class="ss-info-badge">✓ Works immediately</div>
+      </div>
+      <div class="ss-info-card">
+        <div class="ss-info-icon">🪟</div>
+        <div class="ss-info-title">Windows Script (.ps1)</div>
+        <div class="ss-info-desc">PowerShell script — sets dark mode via registry, brightness via WMI, DPI scaling, and opens relevant Settings pages.</div>
+        <div class="ss-info-badge ss-info-badge-y">⚠ Run as Administrator</div>
+      </div>
+      <div class="ss-info-card">
+        <div class="ss-info-icon">🍎</div>
+        <div class="ss-info-title">macOS Script (.sh)</div>
+        <div class="ss-info-desc">Shell + AppleScript toggles dark mode, opens System Preferences display panes for Night Shift and brightness.</div>
+        <div class="ss-info-badge ss-info-badge-y">⚠ chmod +x required</div>
+      </div>
+      <div class="ss-info-card">
+        <div class="ss-info-icon">🎨</div>
+        <div class="ss-info-title">CSS Override</div>
+        <div class="ss-info-desc">Paste into DevTools or a userscript manager to persist these display settings across all websites in your browser.</div>
+        <div class="ss-info-badge">✓ Universal browser support</div>
+      </div>
+    </div>
+
+    <!-- Main Apply Bar -->
+    <div class="ss-apply-bar">
+      <div class="ss-apply-text">
+        <div class="ss-apply-title">Apply Settings</div>
+        <div class="ss-apply-sub">Apply live to this page, download OS scripts, or export for your backend.</div>
+      </div>
+      <div class="ss-apply-btns">
+        <button class="ss-btn-apply" onclick="ssApplyLive()">✓ Apply to Page</button>
+        <button class="ss-btn-sec" onclick="ssToggleExport()">⬇ Export for OS</button>
+        <button class="ss-btn-sec" onclick="ssCopySettings()">📋 Copy Values</button>
+      </div>
+    </div>
+
+    <!-- Export Panel -->
+    <div class="ss-export-panel" id="ssExportPanel">
+      <div class="ss-export-title">Download for your operating system</div>
+      <div class="ss-export-grid">
+        <div class="ss-export-card" onclick="ssDlWindows()">
+          <div class="ss-ec-icon">🪟</div>
+          <div class="ss-ec-name">Windows</div>
+          <div class="ss-ec-desc">PowerShell script<br>Dark mode + Brightness<br>DPI + Night Light</div>
+          <div class="ss-ec-badge">.ps1 script</div>
+        </div>
+        <div class="ss-export-card" onclick="ssDlMac()">
+          <div class="ss-ec-icon">🍎</div>
+          <div class="ss-ec-name">macOS</div>
+          <div class="ss-ec-desc">Shell + AppleScript<br>Dark mode + Night Shift<br>Opens System Prefs</div>
+          <div class="ss-ec-badge">.sh script</div>
+        </div>
+        <div class="ss-export-card" onclick="ssDlCSS()">
+          <div class="ss-ec-icon">🎨</div>
+          <div class="ss-ec-name">CSS Override</div>
+          <div class="ss-ec-desc">Browser DevTools<br>or userscript manager<br>All browsers</div>
+          <div class="ss-ec-badge">.css file</div>
+        </div>
+        <div class="ss-export-card" onclick="ssDlJSON()">
+          <div class="ss-ec-icon">📦</div>
+          <div class="ss-ec-name">JSON Config</div>
+          <div class="ss-ec-desc">Flask backend API<br>POST /settings<br>Full payload</div>
+          <div class="ss-ec-badge">.json file</div>
+        </div>
+        <div class="ss-export-card" onclick="ssOpenWinSettings()">
+          <div class="ss-ec-icon">⚙️</div>
+          <div class="ss-ec-name">Open Windows Settings</div>
+          <div class="ss-ec-desc">Display · Personalisation<br>Night Light · Ease of Access<br>Opens all relevant pages</div>
+          <div class="ss-ec-badge">ms-settings: links</div>
+        </div>
+        <div class="ss-export-card" onclick="ssPrintCard()">
+          <div class="ss-ec-icon">🖨️</div>
+          <div class="ss-ec-name">Print Reference Card</div>
+          <div class="ss-ec-desc">Printable settings summary<br>All recommended values<br>Share with technician</div>
+          <div class="ss-ec-badge">print dialog</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="ss-final">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;margin-bottom:6px">✅ Scan Complete</div>
+      <div style="color:var(--text2);font-size:.88rem;margin-bottom:18px">Thank you for using NeuroVision AI. Stay hydrated, take regular breaks, and get your eyes checked annually.</div>
+      <button class="btn btn-primary" onclick="resetAll()">← Start New Scan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYZING OVERLAY -->
+<div class="analyzing-overlay" id="analyzingOverlay">
+  <div class="analyze-ring"></div>
+  <div class="analyze-text" id="analyzeStepText">Initializing AI Engine</div>
+  <div class="analyze-sub" id="analyzeSubText">Processing neural pathways...</div>
+  <div class="analyze-dots"><span></span><span></span><span></span></div>
+</div>
+
+<!-- CAMERA MODAL -->
+<div class="modal" id="cameraModal">
+  <div class="modal-box">
+    <div class="modal-title">📷 Camera Capture</div>
+    <div class="modal-desc">Position your eye in the center of the frame</div>
+    <video id="cameraVideo" autoplay playsinline></video>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="capturePhoto()">📸 Capture</button>
+      <button class="btn btn-ghost" onclick="closeCamera()">Cancel</button>
+    </div>
+  </div>
+</div>
+<canvas id="snapCanvas" style="display:none"></canvas>
+
+<!-- TOAST -->
+<div class="ss-toast" id="ssToast">✓ Done</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   SNELLEN CHART DATA — 11 acuity levels
+═══════════════════════════════════════════ */
+const SNELLEN_LEVELS = [
+  { acuity:0.25, fraction:'20/80', name:'Very Low Acuity', rows:[{letters:['E'],cls:'cl-r1'}], target:0, answers:['E','F','P','T'] },
+  { acuity:0.5, fraction:'20/40', name:'Low Acuity', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'}], target:1, answers:['F','P','L','D','E','T'] },
+  { acuity:0.75, fraction:'20/27', name:'Below Normal', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'},{letters:['T','O','Z'],cls:'cl-r3'}], target:2, answers:['T','O','Z','L','P','E'] },
+  { acuity:1.0, fraction:'20/20', name:'Normal Vision', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'},{letters:['T','O','Z'],cls:'cl-r3'},{letters:['L','P','E','D'],cls:'cl-r4'}], target:3, answers:['L','P','E','D','F','C'] },
+  { acuity:1.25, fraction:'20/16', name:'Good Vision', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'},{letters:['T','O','Z'],cls:'cl-r3'},{letters:['L','P','E','D'],cls:'cl-r4'},{letters:['P','E','C','F','D'],cls:'cl-r5'}], target:4, answers:['P','E','C','F','D','Z','T'] },
+  { acuity:1.5, fraction:'20/13', name:'Above Normal', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'},{letters:['T','O','Z'],cls:'cl-r3'},{letters:['L','P','E','D'],cls:'cl-r4'},{letters:['P','E','C','F','D'],cls:'cl-r5'},{letters:['E','D','F','C','Z','P'],cls:'cl-r6'}], target:5, answers:['E','D','F','C','Z','P','T','O'] },
+  { acuity:2.0, fraction:'20/10', name:'Excellent Vision', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'},{letters:['T','O','Z'],cls:'cl-r3'},{letters:['L','P','E','D'],cls:'cl-r4'},{letters:['P','E','C','F','D'],cls:'cl-r5'},{letters:['E','D','F','C','Z','P'],cls:'cl-r6'},{letters:['F','E','L','O','P','Z','D'],cls:'cl-r7'}], target:6, answers:['F','E','L','O','P','Z','D','C'] },
+  { acuity:2.5, fraction:'20/8', name:'Sharp Vision', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'},{letters:['T','O','Z'],cls:'cl-r3'},{letters:['L','P','E','D'],cls:'cl-r4'},{letters:['P','E','C','F','D'],cls:'cl-r5'},{letters:['E','D','F','C','Z','P'],cls:'cl-r6'},{letters:['F','E','L','O','P','Z','D'],cls:'cl-r7'},{letters:['D','E','F','P','O','T','E','C'],cls:'cl-r8'}], target:7, answers:['D','E','F','P','O','T','C','Z'] },
+  { acuity:3.0, fraction:'20/7', name:'Very Sharp Vision', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'},{letters:['T','O','Z'],cls:'cl-r3'},{letters:['L','P','E','D'],cls:'cl-r4'},{letters:['P','E','C','F','D'],cls:'cl-r5'},{letters:['E','D','F','C','Z','P'],cls:'cl-r6'},{letters:['F','E','L','O','P','Z','D'],cls:'cl-r7'},{letters:['D','E','F','P','O','T','E','C'],cls:'cl-r8'},{letters:['L','E','F','O','D','P','C','T','Z'],cls:'cl-r9'}], target:8, answers:['L','E','F','O','D','P','C','T','Z'] },
+  { acuity:4.0, fraction:'20/5', name:'Superior Vision', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'},{letters:['T','O','Z'],cls:'cl-r3'},{letters:['L','P','E','D'],cls:'cl-r4'},{letters:['P','E','C','F','D'],cls:'cl-r5'},{letters:['E','D','F','C','Z','P'],cls:'cl-r6'},{letters:['F','E','L','O','P','Z','D'],cls:'cl-r7'},{letters:['D','E','F','P','O','T','E','C'],cls:'cl-r8'},{letters:['L','E','F','O','D','P','C','T','Z'],cls:'cl-r9'},{letters:['F','D','P','L','T','C','E','O','Z','P'],cls:'cl-r10'}], target:9, answers:['F','D','P','L','T','C','E','O','Z'] },
+  { acuity:6.0, fraction:'20/3', name:'Hawk-Eye Vision', rows:[{letters:['E'],cls:'cl-r1'},{letters:['F','P'],cls:'cl-r2'},{letters:['T','O','Z'],cls:'cl-r3'},{letters:['L','P','E','D'],cls:'cl-r4'},{letters:['P','E','C','F','D'],cls:'cl-r5'},{letters:['E','D','F','C','Z','P'],cls:'cl-r6'},{letters:['F','E','L','O','P','Z','D'],cls:'cl-r7'},{letters:['D','E','F','P','O','T','E','C'],cls:'cl-r8'},{letters:['L','E','F','O','D','P','C','T','Z'],cls:'cl-r9'},{letters:['F','D','P','L','T','C','E','O','Z','P'],cls:'cl-r10'},{letters:['E','F','P','T','O','Z','L','D','C','P','E'],cls:'cl-r11'}], target:10, answers:['E','F','P','T','O','Z','L','D','C'] },
+];
+
+/* ═══════════════ STATE ═══════════════ */
+const API_BASE = 'http://127.0.0.1:5000/api';
+const state = {
+  sessionId: null,
+  user: {name:'',age:'',gender:''},
+  eyeMode: 'both',
+  levelIdx: 0,
+  timerInterval: null,
+  timerVal: 12,
+  testResults: [],
+  testDone: false,
+  uploadedImage: null,
+  eyeAnalysis: null,
+  results: null,
+  chartInst: null,
+  colorTemp: 'D65',
+};
+
+async function apiRequest(path, options={}){
+  try{
+    const res = await fetch(`${API_BASE}${path}`,{headers:{'Content-Type':'application/json'},...options});
+    const body = await res.json().catch(()=>null);
+    if(!res.ok){ console.warn('API request failed',path,res.status,body); return null; }
+    return body;
+  }catch(err){ console.warn('Unable to reach backend',err); return null; }
+}
+
+async function createBackendSession(){
+  const data = await apiRequest('/sessions',{method:'POST',body:JSON.stringify({eye_mode:state.eyeMode,user_name:state.user.name,user_age:state.user.age,user_gender:state.user.gender})});
+  if(data && data.session_id){ state.sessionId = data.session_id; }
+}
+
+async function syncSessionToBackend(){
+  if(!state.sessionId) return;
+  const passed = state.testResults.filter(r=>r.passed).length;
+  const best = state.testResults.filter(r=>r.passed).reduce((a,b)=>b.acuity>a.acuity?b:a,{acuity:0,fraction:'—',name:'—'});
+  const overall = Math.round(Math.min(100,(passed/11)*60+(best.acuity/6)*30+10));
+  await apiRequest(`/sessions/${state.sessionId}/results`,{method:'POST',body:JSON.stringify({
+    results:state.testResults.map(r=>({acuity:r.acuity,fraction:r.fraction,level_name:r.name,letters:r.letters,chosen:r.chosen,passed:r.passed})),
+    overall_score:overall,best_acuity:best.acuity,best_fraction:best.fraction,
+    levels_passed:passed,strain_risk:state.results?.strain||0,grade:overall>=85?'Excellent':'Good',eye_mode:state.eyeMode,
+  })});
+}
+
+/* ═══════════════════════════════════════════
+   MICROPHONE ENGINE
+═══════════════════════════════════════════ */
+const mic = {recognition:null,audioCtx:null,analyser:null,micStream:null,animFrame:null,isListening:false,mode:'continuous',pendingLetters:[],supported:false};
+
+(function(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(SR){ mic.supported=true; mic.recognition=new SR(); mic.recognition.continuous=true; mic.recognition.interimResults=true; mic.recognition.lang='en-US'; mic.recognition.maxAlternatives=3; }
+})();
+
+function setMicMode(mode,btn){ mic.mode=mode; document.querySelectorAll('.mm-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); if(mic.isListening){stopMic();startMic();} }
+function toggleMic(){ if(!mic.supported){alert('Speech recognition not supported. Please use Chrome or Edge.');return;} if(mic.isListening)stopMic(); else startMic(); }
+
+async function ensureMicPermission(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){alert('This browser cannot access the microphone.');return false;}
+  try{const p=typeof navigator.permissions?.query==='function'?await navigator.permissions.query({name:'microphone'}):null;if(p&&p.state==='denied'){alert('Microphone is blocked. Please allow access in browser settings.');return false;}}catch(e){}
+  try{const s=await navigator.mediaDevices.getUserMedia({audio:true,video:false});if(mic.micStream)mic.micStream.getTracks().forEach(t=>t.stop());mic.micStream=s;return true;}
+  catch(err){alert(err.name==='NotAllowedError'?'Microphone permission denied.':'Could not access microphone.');return false;}
+}
+
+async function startMic(){
+  if(mic.isListening)return; mic.isListening=true; mic.pendingLetters=[]; clearMicUI();
+  const btn=document.getElementById('micBtn');
+  btn.classList.add('listening'); document.getElementById('micIcon').textContent='🔴';
+  document.getElementById('micStatus').textContent='Listening…';
+  document.getElementById('micHint').textContent=mic.mode==='continuous'?'Speak letters — auto-submits after a pause':'Speak letters, then say "confirm" or click Submit';
+  document.getElementById('micPanel').classList.add('mic-active');
+  const ok=await ensureMicPermission(); if(!ok){stopMic();return;}
+  setupRecognitionHandlers(); try{mic.recognition.start();}catch(e){} startWaveform();
+}
+
+function stopMic(){
+  if(!mic.isListening)return; mic.isListening=false;
+  try{mic.recognition.stop();}catch(e){} stopWaveform();
+  const btn=document.getElementById('micBtn'); btn.classList.remove('listening','heard');
+  document.getElementById('micIcon').textContent='🎙'; document.getElementById('micStatus').textContent='Microphone Off';
+  document.getElementById('micHint').textContent='Click 🎙 to speak your answer'; document.getElementById('micPanel').classList.remove('mic-active','mic-heard');
+}
+
+function resetMicForNextLevel(){
+  mic.pendingLetters=[]; clearMicUI();
+  if(mic.isListening){try{mic.recognition.stop();}catch(e){} setTimeout(()=>{if(mic.isListening)try{mic.recognition.start();}catch(e){}},400);}
+}
+
+function clearMicUI(){
+  document.getElementById('micRaw').textContent='Waiting for speech...'; document.getElementById('micHeardLetters').innerHTML='';
+  document.getElementById('micConfirmBar').classList.remove('show'); document.getElementById('micConfirmLetters').textContent='';
+  document.getElementById('micPanel').classList.remove('mic-heard'); document.getElementById('micBtn').classList.remove('heard');
+}
+
+function setupRecognitionHandlers(){
+  let silenceTimer=null;
+  mic.recognition.onresult=function(ev){
+    let interim='',final_='';
+    for(let i=ev.resultIndex;i<ev.results.length;i++){const t=ev.results[i][0].transcript;if(ev.results[i].isFinal)final_+=t;else interim+=t;}
+    const rawText=(final_||interim).trim().toUpperCase(); if(!rawText)return;
+    document.getElementById('micRaw').textContent='"'+rawText.toLowerCase()+'"';
+    const letters=extractLettersFromSpeech(rawText);
+    if(rawText.includes('CONFIRM')||rawText.includes('SUBMIT')||rawText.includes('DONE')){confirmMicAnswer();return;}
+    if(rawText.includes('CLEAR')||rawText.includes('RESET')||rawText.includes('AGAIN')){clearMicAnswer();return;}
+    if(letters.length>0){
+      updateMicLetters(letters);
+      if(mic.mode==='continuous'){clearTimeout(silenceTimer);silenceTimer=setTimeout(()=>{if(mic.pendingLetters.length>0)confirmMicAnswer();},1600);}
+    }
+  };
+  mic.recognition.onerror=function(ev){if(ev.error==='not-allowed'){alert('Microphone permission denied.');stopMic();}};
+  mic.recognition.onend=function(){if(mic.isListening)try{mic.recognition.start();}catch(e){}};
+}
+
+function extractLettersFromSpeech(text){
+  const phonetic={'AY':'A','BEE':'B','BE':'B','SEE':'C','SEA':'C','DEE':'D','EE':'E','EF':'F','FE':'F','GEE':'G','AITCH':'H','EL':'L','ELLE':'L','EM':'M','EN':'N','OH':'O','PEE':'P','PE':'P','ARE':'R','AR':'R','ESS':'S','TEE':'T','TE':'T','YOU':'U','VEE':'V','WHY':'Y','ZEE':'Z','ZED':'Z'};
+  const found=[]; const directMatch=text.match(/\b([A-Z])\b/g); if(directMatch)directMatch.forEach(l=>found.push(l));
+  const words=text.split(/[\s,]+/); words.forEach(w=>{if(phonetic[w]&&!found.includes(phonetic[w]))found.push(phonetic[w]);});
+  return [...new Set(found)];
+}
+
+function updateMicLetters(letters){
+  const lv=SNELLEN_LEVELS[state.levelIdx]; if(!lv)return;
+  letters.forEach(l=>{if(!mic.pendingLetters.includes(l))mic.pendingLetters.push(l);});
+  const container=document.getElementById('micHeardLetters');
+  document.getElementById('micRaw').style.display='none'; container.innerHTML='';
+  mic.pendingLetters.forEach(l=>{const chip=document.createElement('div');chip.className='mic-letter-chip';chip.textContent=l;container.appendChild(chip);});
+  document.getElementById('micConfirmLetters').textContent='Heard: '+mic.pendingLetters.join(' · ');
+  document.getElementById('micConfirmBar').classList.add('show');
+  document.getElementById('micPanel').classList.add('mic-heard'); document.getElementById('micPanel').classList.remove('mic-active');
+  document.getElementById('micBtn').classList.remove('listening'); document.getElementById('micBtn').classList.add('heard');
+  document.getElementById('micIcon').textContent='✓'; document.getElementById('micStatus').textContent='Letter(s) detected!';
+}
+
+function confirmMicAnswer(){
+  if(mic.pendingLetters.length===0)return;
+  const lv=SNELLEN_LEVELS[state.levelIdx]; if(!lv)return;
+  const targetLetters=[...new Set(lv.rows[lv.target].letters)]; const spoken=[...mic.pendingLetters];
+  const chips=document.getElementById('micHeardLetters').children;
+  Array.from(chips).forEach(chip=>{chip.classList.add(targetLetters.includes(chip.textContent)?'match':'nomatch');});
+  clearInterval(state.timerInterval);
+  document.querySelectorAll('.answer-opt').forEach(b=>b.onclick=null);
+  let passed;
+  if(targetLetters.length===1){
+    passed=spoken.includes(targetLetters[0]);
+    document.querySelectorAll('.answer-opt').forEach(b=>{if(b.textContent.trim()===targetLetters[0])b.classList.add('correct');else if(spoken.includes(b.textContent.trim()))b.classList.add('wrong');});
+  } else {
+    const cSet=new Set(targetLetters);const sSet=new Set(spoken);passed=[...cSet].every(l=>sSet.has(l));
+    document.querySelectorAll('.answer-opt').forEach(b=>{const t=b.textContent.trim();if(cSet.has(t))b.classList.add('correct');else if(sSet.has(t))b.classList.add('wrong');});
+  }
+  const rowEl=document.getElementById('chartrow'+lv.target);
+  if(rowEl){rowEl.classList.remove('active-row');rowEl.classList.add(passed?'passed-row':'failed-row');}
+  state.testResults[state.levelIdx]={acuity:lv.acuity,fraction:lv.fraction,name:lv.name,letters:targetLetters.join(' '),chosen:spoken.join(' ')+' (🎙)',passed};
+  document.getElementById('micStatus').textContent=passed?'✓ Correct!':'✗ Try next level';
+  document.getElementById('micConfirmBar').classList.remove('show');
+  setTimeout(()=>{resetMicForNextLevel();showLevel(state.levelIdx+1);},1100);
+}
+
+function clearMicAnswer(){
+  mic.pendingLetters=[]; clearMicUI();
+  document.getElementById('micRaw').style.display='block'; document.getElementById('micStatus').textContent='Listening…';
+  document.getElementById('micPanel').classList.remove('mic-heard'); document.getElementById('micPanel').classList.add('mic-active');
+  document.getElementById('micBtn').classList.remove('heard'); document.getElementById('micBtn').classList.add('listening');
+  document.getElementById('micIcon').textContent='🔴';
+}
+
+function startWaveform(){
+  const canvas=document.getElementById('micWaveCanvas'); if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const startVisual=(stream)=>{
+    mic.micStream=stream; mic.audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    mic.analyser=mic.audioCtx.createAnalyser(); mic.analyser.fftSize=256;
+    const src=mic.audioCtx.createMediaStreamSource(stream); src.connect(mic.analyser); drawWave(canvas,ctx);
+  };
+  if(mic.micStream){startVisual(mic.micStream);return;}
+  navigator.mediaDevices.getUserMedia({audio:true,video:false}).then(startVisual).catch(()=>drawFlatWave(canvas,ctx));
+}
+
+function drawWave(canvas,ctx){
+  const buf=new Uint8Array(mic.analyser.frequencyBinCount);
+  function loop(){
+    mic.animFrame=requestAnimationFrame(loop); canvas.width=canvas.offsetWidth;
+    mic.analyser.getByteTimeDomainData(buf); ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.lineWidth=2;
+    const grad=ctx.createLinearGradient(0,0,canvas.width,0);
+    grad.addColorStop(0,'rgba(59,130,246,0)'); grad.addColorStop(.3,'#0ff4c6');
+    grad.addColorStop(.7,'#3b82f6'); grad.addColorStop(1,'rgba(168,85,247,0)');
+    ctx.strokeStyle=grad; ctx.shadowColor='#0ff4c6'; ctx.shadowBlur=8;
+    ctx.beginPath(); const sliceW=canvas.width/buf.length; let x=0;
+    for(let i=0;i<buf.length;i++){const v=buf[i]/128.0;const y=v*canvas.height/2;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);x+=sliceW;}
+    ctx.stroke(); ctx.shadowBlur=0;
+  }
+  loop();
+}
+
+function drawFlatWave(canvas,ctx){
+  let t=0;
+  function loop(){
+    mic.animFrame=requestAnimationFrame(loop); canvas.width=canvas.offsetWidth;
+    ctx.clearRect(0,0,canvas.width,canvas.height); ctx.lineWidth=1.5;
+    const grad=ctx.createLinearGradient(0,0,canvas.width,0);
+    grad.addColorStop(0,'rgba(59,130,246,0)'); grad.addColorStop(.5,'rgba(59,130,246,.4)'); grad.addColorStop(1,'rgba(59,130,246,0)');
+    ctx.strokeStyle=grad; ctx.beginPath();
+    for(let x=0;x<canvas.width;x++){const y=canvas.height/2+Math.sin((x/canvas.width)*Math.PI*6+t)*3;if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+    ctx.stroke(); t+=0.06;
+  }
+  loop();
+}
+
+function stopWaveform(){
+  if(mic.animFrame)cancelAnimationFrame(mic.animFrame);
+  if(mic.micStream)mic.micStream.getTracks().forEach(t=>t.stop());
+  if(mic.audioCtx)mic.audioCtx.close().catch(()=>{});
+  mic.audioCtx=null;mic.analyser=null;mic.micStream=null;mic.animFrame=null;
+  const canvas=document.getElementById('micWaveCanvas');
+  if(canvas){canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);}
+}
+
+/* ═══════════════ NAVIGATION ═══════════════ */
+function goTo(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='results')initResults();
+  if(id==='screen-settings')initScreenSettings();
+}
+
+function resetAll(){
+  state.levelIdx=0;state.testResults=[];state.testDone=false;
+  state.uploadedImage=null;state.results=null;state.sessionId=null;
+  goTo('landing');
+}
+
+/* ═══════════════ REGISTRATION ═══════════════ */
+function selectGender(el,val){
+  document.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');state.user.gender=val;
+}
+
+async function startVisionTest(){
+  const name=document.getElementById('userName').value.trim();
+  const age=document.getElementById('userAge').value;
+  if(!name){alert('Please enter your name');return;}
+  if(!age||age<5||age>100){alert('Please enter a valid age');return;}
+  state.user.name=name;state.user.age=parseInt(age);
+  state.levelIdx=0;state.testResults=[];state.testDone=false;state.sessionId=null;
+  await createBackendSession();
+  initProgressBars();
+  goTo('vision-test');
+  showLevel(0);
+}
+
+/* ═══════════════ PROGRESS BARS ═══════════════ */
+function initProgressBars(){
+  const container=document.getElementById('snellenProgress'); container.innerHTML='';
+  SNELLEN_LEVELS.forEach((lv,i)=>{
+    const maxH=60,minH=10,h=maxH-((maxH-minH)/10)*i;
+    const bar=document.createElement('div'); bar.className='sp-bar future'; bar.style.height=h+'px'; bar.id='spbar'+i;
+    const lbl=document.createElement('div'); lbl.className='sp-bar-label'; lbl.textContent=lv.acuity; bar.appendChild(lbl);
+    container.appendChild(bar);
+  });
+}
+
+function updateProgressBar(idx,st){
+  const bar=document.getElementById('spbar'+idx); if(!bar)return;
+  bar.className='sp-bar '+st;
+}
+
+/* ═══════════════ SHOW LEVEL ═══════════════ */
+function showLevel(idx){
+  if(idx>=SNELLEN_LEVELS.length){endTest();return;}
+  const lv=SNELLEN_LEVELS[idx]; state.levelIdx=idx;
+  document.getElementById('chartTitle').textContent='Acuity Level '+lv.acuity;
+  document.getElementById('levelNum').textContent=idx+1;
+  document.getElementById('acuityTag').textContent=lv.acuity;
+  for(let i=0;i<idx;i++){const r=state.testResults[i];updateProgressBar(i,r&&r.passed?'pass':'fail');}
+  updateProgressBar(idx,'active');
+  for(let i=idx+1;i<SNELLEN_LEVELS.length;i++)updateProgressBar(i,'future');
+  buildChartBox(lv,idx);
+  buildAnswerGrid(lv,idx);
+  startTimer(lv,idx);
+}
+
+function buildChartBox(lv,idx){
+  const box=document.getElementById('chartBox'); box.innerHTML='';
+  const hdr=document.createElement('div'); hdr.className='chart-box-header';
+  hdr.innerHTML=`<span class="chart-acuity-label">${lv.acuity} — ${lv.fraction}</span><span class="chart-level-name">${lv.name}</span><span class="chart-eye-tag">${state.eyeMode==='both'?'👁 Both':state.eyeMode==='left'?'👁 Left':'👁 Right'}</span>`;
+  box.appendChild(hdr);
+  lv.rows.forEach((row,ri)=>{
+    const rowEl=document.createElement('div'); rowEl.className='chart-letter-row '+row.cls;
+    if(ri===lv.target)rowEl.classList.add('active-row'); rowEl.id='chartrow'+ri;
+    row.letters.forEach(l=>{const s=document.createElement('span');s.textContent=' '+l+' ';rowEl.appendChild(s);});
+    box.appendChild(rowEl);
+  });
+}
+
+function buildAnswerGrid(lv,idx){
+  const targetRow=lv.rows[lv.target]; const targetLetters=[...new Set(targetRow.letters)];
+  const pool=[...new Set(lv.answers)];
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  let opts=[...targetLetters];
+  for(const p of pool){if(!opts.includes(p))opts.push(p);if(opts.length>=8)break;}
+  opts.sort(()=>Math.random()-.5);
+  const grid=document.getElementById('answerGrid'); grid.innerHTML='';
+  if(targetLetters.length===1){
+    const correct=targetLetters[0];
+    opts.forEach(o=>{const btn=document.createElement('div');btn.className='answer-opt';btn.textContent=o;btn.onclick=()=>checkSingle(o,correct,btn,lv,idx);grid.appendChild(btn);});
+    document.querySelector('.answer-prompt').textContent='Which letter is in the highlighted row?';
+  } else {
+    let selected=[];
+    opts.forEach(o=>{
+      const btn=document.createElement('div'); btn.className='answer-opt'; btn.textContent=o;
+      btn.onclick=()=>{if(btn.classList.contains('sel')){btn.classList.remove('sel');btn.style.borderColor='';btn.style.background='';selected=selected.filter(x=>x!==o);}else{btn.classList.add('sel');btn.style.borderColor='var(--accent2)';btn.style.background='rgba(59,130,246,.18)';selected.push(o);}};
+      grid.appendChild(btn);
+    });
+    const confirm=document.createElement('div'); confirm.className='answer-opt';
+    confirm.style.cssText='background:rgba(59,130,246,.18);border-color:var(--accent2);color:var(--accent2);min-width:120px;margin-top:4px';
+    confirm.textContent='✓ Confirm Selection'; confirm.onclick=()=>checkMulti(selected,targetLetters,grid,lv,idx);
+    grid.appendChild(confirm);
+    document.querySelector('.answer-prompt').textContent=`Select all letters in the highlighted row (${targetLetters.length} letters):`;
+  }
+}
+
+function checkSingle(chosen,correct,btn,lv,idx){
+  clearInterval(state.timerInterval); document.querySelectorAll('.answer-opt').forEach(b=>b.onclick=null);
+  const passed=chosen===correct; btn.classList.add(passed?'correct':'wrong');
+  if(!passed)document.querySelectorAll('.answer-opt').forEach(b=>{if(b.textContent===correct)b.classList.add('correct');});
+  const rowEl=document.getElementById('chartrow'+lv.target);
+  if(rowEl){rowEl.classList.remove('active-row');rowEl.classList.add(passed?'passed-row':'failed-row');}
+  state.testResults[idx]={acuity:lv.acuity,fraction:lv.fraction,name:lv.name,letters:lv.rows[lv.target].letters.join(' '),chosen,passed};
+  if(!passed){
+    for(let i=idx+1;i<SNELLEN_LEVELS.length;i++){const level=SNELLEN_LEVELS[i];state.testResults[i]={acuity:level.acuity,fraction:level.fraction,name:level.name,letters:'—',chosen:'—',passed:false};}
+    setTimeout(()=>endTest(),1200);return;
+  }
+  setTimeout(()=>showLevel(idx+1),1100);
+}
+
+function checkMulti(selected,correct,grid,lv,idx){
+  clearInterval(state.timerInterval); document.querySelectorAll('.answer-opt').forEach(b=>b.onclick=null);
+  const cSet=new Set(correct);const sSet=new Set(selected);const passed=[...cSet].every(l=>sSet.has(l));
+  document.querySelectorAll('.answer-opt').forEach(b=>{const t=b.textContent.trim();if(cSet.has(t))b.classList.add('correct');else if(sSet.has(t)&&!cSet.has(t))b.classList.add('wrong');});
+  const rowEl=document.getElementById('chartrow'+lv.target);
+  if(rowEl){rowEl.classList.remove('active-row');rowEl.classList.add(passed?'passed-row':'failed-row');}
+  state.testResults[idx]={acuity:lv.acuity,fraction:lv.fraction,name:lv.name,letters:correct.join(' '),chosen:selected.join(' ')||'—',passed};
+  if(!passed){
+    for(let i=idx+1;i<SNELLEN_LEVELS.length;i++){const level=SNELLEN_LEVELS[i];state.testResults[i]={acuity:level.acuity,fraction:level.fraction,name:level.name,letters:'—',chosen:'—',passed:false};}
+    setTimeout(()=>endTest(),1200);return;
+  }
+  setTimeout(()=>showLevel(idx+1),1200);
+}
+
+/* ═══════════════ TIMER ═══════════════ */
+function startTimer(lv,idx){
+  state.timerVal=12;
+  const ring=document.getElementById('timerRing');const txt=document.getElementById('timerText');const circ=157;
+  ring.style.strokeDashoffset=0; clearInterval(state.timerInterval);
+  state.timerInterval=setInterval(()=>{
+    state.timerVal--; ring.style.strokeDashoffset=circ*(1-state.timerVal/12); txt.textContent=state.timerVal;
+    if(state.timerVal<=0){
+      clearInterval(state.timerInterval);
+      const targetLetters=lv.rows[lv.target].letters;
+      state.testResults[idx]={acuity:lv.acuity,fraction:lv.fraction,name:lv.name,letters:targetLetters.join(' '),chosen:'—',passed:false};
+      const rowEl=document.getElementById('chartrow'+lv.target);
+      if(rowEl){rowEl.classList.remove('active-row');rowEl.classList.add('failed-row');}
+      for(let i=idx+1;i<SNELLEN_LEVELS.length;i++){const level=SNELLEN_LEVELS[i];state.testResults[i]={acuity:level.acuity,fraction:level.fraction,name:level.name,letters:'—',chosen:'—',passed:false};}
+      setTimeout(()=>endTest(),700);
+    }
+  },1000);
+}
+
+/* ═══════════════ EYE MODE ═══════════════ */
+function setEyeMode(mode,btn){
+  state.eyeMode=mode; document.querySelectorAll('.em-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+  const inst=document.getElementById('eyeInstruction');
+  if(mode==='both')inst.textContent='👁 Both Eyes Open — Read the highlighted row';
+  if(mode==='left')inst.textContent='🫣 Cover RIGHT Eye — Left Eye Only';
+  if(mode==='right')inst.textContent='🫣 Cover LEFT Eye — Right Eye Only';
+}
+
+/* ═══════════════ END TEST ═══════════════ */
+async function endTest(){
+  clearInterval(state.timerInterval); state.testDone=true;
+  state.testResults.forEach((r,i)=>updateProgressBar(i,r.passed?'pass':'fail'));
+  const passed=state.testResults.filter(r=>r.passed).length;
+  const best=state.testResults.filter(r=>r.passed).reduce((a,b)=>b.acuity>a.acuity?b:a,{acuity:0,fraction:'—',name:'—'});
+  let tableRows=state.testResults.map(r=>`<tr><td class="acuity-cell">${r.acuity}</td><td>${r.name}</td><td style="font-family:'Syne',sans-serif;color:#64748b">${r.letters}</td><td style="color:var(--text)">${r.chosen}</td><td class="${r.passed?'pass-cell':'fail-cell'}">${r.passed?'✓ Pass':'✗ Fail'}</td><td class="acuity-cell">${r.fraction}</td></tr>`).join('');
+  document.getElementById('testComplete').style.display='block';
+  document.getElementById('testComplete').innerHTML=`
+    <div class="test-complete-card">
+      <div class="check-circle">✓</div>
+      <div class="complete-title">Test Complete!</div>
+      <div class="complete-desc">You passed <strong style="color:var(--teal)">${passed}</strong> out of 11 levels.</div>
+      <div class="complete-desc" style="margin-top:4px">Best acuity: <strong style="color:var(--accent2)">${best.acuity} (${best.fraction})</strong> — ${best.name}</div>
+      <div style="overflow-x:auto">
+        <table class="result-table">
+          <thead><tr><th>Acuity</th><th>Level</th><th>Target</th><th>Your Answer</th><th>Result</th><th>20/x</th></tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap">
+        <button class="btn btn-teal" onclick="downloadTestReport()">⬇ Download Test Report</button>
+        <button class="btn btn-primary" onclick="goTo('eye-upload')">Upload Eye Image →</button>
+      </div>
+    </div>`;
+  document.getElementById('chartBox').style.display='none';
+  document.getElementById('answerGrid').style.display='none';
+  document.querySelector('.test-topbar').style.display='none';
+  document.querySelector('.instruction-box').style.display='none';
+  document.querySelector('.answer-section').style.display='none';
+  document.getElementById('snellenProgress').style.opacity='.5';
+  await syncSessionToBackend();
+}
+
+/* ═══════════════ UPLOAD ═══════════════ */
+const dropZone=document.getElementById('dropZone');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)showPreview(f);});
+function handleFile(ev){const f=ev.target.files[0];if(f)showPreview(f);}
+function showPreview(file){
+  const reader=new FileReader();
+  reader.onload=e=>{document.getElementById('previewImg').src=e.target.result;document.getElementById('previewArea').style.display='block';state.uploadedImage=e.target.result;};
+  reader.readAsDataURL(file);
+}
+function skipUpload(){generateResults();goTo('results');}
+
+/* ═══════════════ CAMERA ═══════════════ */
+let cameraStream=null;
+function openCamera(){
+  document.getElementById('cameraModal').classList.add('show');
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}})
+    .then(s=>{cameraStream=s;document.getElementById('cameraVideo').srcObject=s;})
+    .catch(()=>{alert('Camera access denied.');closeCamera();});
+}
+function closeCamera(){if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());document.getElementById('cameraModal').classList.remove('show');}
+function capturePhoto(){
+  const video=document.getElementById('cameraVideo');const canvas=document.getElementById('snapCanvas');
+  canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext('2d').drawImage(video,0,0);
+  const data=canvas.toDataURL('image/png');
+  document.getElementById('previewImg').src=data;document.getElementById('previewArea').style.display='block';state.uploadedImage=data;closeCamera();
+}
+
+/* ═══════════════ ANALYSIS ═══════════════ */
+const analyzeSteps=[['Preprocessing Image','Normalizing colors & contrast...'],['Iris Segmentation','Locating iris boundaries...'],['Vessel Detection','Mapping blood vessel patterns...'],['Dryness Analysis','Evaluating surface texture...'],['AI Classification','Running neural network inference...'],['Generating Report','Compiling personalized results...']];
+
+async function startAnalysis(){
+  const overlay=document.getElementById('analyzingOverlay'); overlay.classList.add('show');
+  let i=0;
+  const interval=setInterval(()=>{if(i>=analyzeSteps.length)i=analyzeSteps.length-1;document.getElementById('analyzeStepText').textContent=analyzeSteps[i][0];document.getElementById('analyzeSubText').textContent=analyzeSteps[i][1];i++;},900);
+  try{
+    if(!state.sessionId)await createBackendSession();
+    if(state.uploadedImage&&state.sessionId){
+      const data=await apiRequest(`/sessions/${state.sessionId}/eye-image`,{method:'POST',body:JSON.stringify({image_base64:state.uploadedImage})});
+      if(data&&data.analysis)state.eyeAnalysis=data.analysis;
+    }
+  }catch(err){console.warn('Eye analysis failed',err);}
+  finally{clearInterval(interval);overlay.classList.remove('show');generateResults();goTo('results');}
+}
+
+/* ═══════════════ RESULTS GENERATION ═══════════════ */
+function generateResults(){
+  state.results=null;
+  const age=Number(state.user.age)||30;
+  const passed=state.testResults.filter(r=>r.passed).length;
+  const best=state.testResults.filter(r=>r.passed).reduce((a,b)=>b.acuity>a.acuity?b:a,{acuity:0,fraction:'—',name:'None'});
+  const passRatio=passed/11;
+  const ai=state.eyeAnalysis&&state.eyeAnalysis.analysis?state.eyeAnalysis.analysis:null;
+  const strain=Math.max(8,Math.min(92,Math.round((ai?.anomaly_score||0)*100+(1-passRatio)*40+(age>45?8:0)+8)));
+  const dryness=Math.max(5,Math.min(95,Math.round((ai?.dryness_score||0)*100+(1-passRatio)*22+(age>40?6:0))));
+  const blueLight=Math.max(35,Math.min(90,Math.round((ai?.redness_score||0)*100+(1-passRatio)*18+45)));
+  const overall=Math.max(0,Math.min(100,Math.round(passRatio*65+(best.acuity/6)*25+(ai?.overall_eye_health||0.75)*10)));
+  state.results={overall,passed,best,strain,dryness,blueLight};
+
+  // Set slider recommended values
+  const brightRec=Math.max(25,Math.min(80,Math.round(58-strain*0.35)));
+  document.getElementById('sBright').value=brightRec; document.getElementById('vBright').textContent=brightRec+'%';
+  document.getElementById('sBlue').value=blueLight; document.getElementById('vBlue').textContent=blueLight+'%';
+  const zoom=best.acuity<1?125:best.acuity<2?110:100;
+  document.getElementById('sZoom').value=zoom; document.getElementById('vZoom').textContent=zoom+'%';
+  const fontSize=best.acuity<1?18:best.acuity<2?16:14;
+  document.getElementById('sFont').value=fontSize; document.getElementById('vFont').textContent=fontSize+'px';
+}
+
+/* ═══════════════ INIT RESULTS PAGE ═══════════════ */
+let radarInst=null;
+function initResults(){
+  generateResults();
+  const r=state.results;
+  document.getElementById('patientLabel').textContent=`Report for ${state.user.name||'Patient'}, Age ${state.user.age||'—'}, ${state.user.gender||''}`;
+  let n=0;
+  const si=setInterval(()=>{n=Math.min(n+2,r.overall);document.getElementById('scoreNum').textContent=n;document.getElementById('scoreFill').style.strokeDashoffset=339*(1-n/100);if(n>=r.overall)clearInterval(si);},20);
+  const grade=r.overall>=85?'Excellent Vision':r.overall>=70?'Good Vision':r.overall>=55?'Fair Vision':'Needs Attention';
+  document.getElementById('scoreGrade').textContent=grade;
+  document.getElementById('scoreDesc').textContent=`Passed ${r.passed}/11 Snellen levels. Best acuity: ${r.best.acuity} (${r.best.fraction}) — ${r.best.name}.`;
+  const badges=document.getElementById('acuityBadges'); badges.innerHTML='';
+  const cls=r.overall>=80?'badge-teal':r.overall>=60?'badge-amber':'badge-red';
+  badges.innerHTML=`<span class="badge ${cls}">${grade}</span><span class="badge badge-amber">Strain: ${r.strain}%</span><span class="badge badge-teal">${r.passed}/11 Passed</span>`;
+  const tbody=document.getElementById('snellenTableBody');
+  tbody.innerHTML=state.testResults.map(res=>`<tr><td class="acuity-cell">${res.acuity}</td><td>${res.name}</td><td style="font-family:'Syne',sans-serif;font-size:.8rem;color:var(--text3)">${res.letters}</td><td>${res.chosen}</td><td class="${res.passed?'pass-cell':'fail-cell'}">${res.passed?'✓ Pass':'✗ Fail'}</td><td class="acuity-cell">${res.fraction}</td></tr>`).join('');
+  document.getElementById('passCount').textContent=r.passed+'/11 Passed';
+  const bestPct=Math.round((r.best.acuity/6)*100);
+  document.getElementById('bestAcuityVal').textContent=r.best.acuity+' ('+r.best.fraction+')';
+  document.getElementById('bestAcuityBadge').textContent=r.best.name;
+  document.getElementById('bestBar').style.width=bestPct+'%';
+  document.getElementById('strainVal').textContent=r.strain+'%'; document.getElementById('strainBar').style.width=r.strain+'%';
+  document.getElementById('passRateVal').textContent=r.passed+' / 11';
+  document.getElementById('passRateBadge').textContent=Math.round((r.passed/11)*100)+'%';
+  document.getElementById('passBar').style.width=Math.round((r.passed/11)*100)+'%';
+  document.getElementById('blueVal').textContent=r.blueLight+'%'; document.getElementById('blueBar').style.width=r.blueLight+'%';
+  document.getElementById('recContext').textContent=`Personalized for ${state.user.gender||'patient'}, age ${state.user.age||'—'}`;
+  if(r.best.acuity<1.0){
+    document.getElementById('rec1').innerHTML='<strong>Vision Correction Needed:</strong> Your acuity is below 20/20. Consult an optometrist.';
+    document.getElementById('rec4').innerHTML='<strong>Urgent Checkup:</strong> We recommend an in-person optometrist visit within 3 months.';
+  } else if(r.best.acuity>=2.0){
+    document.getElementById('rec1').innerHTML='<strong>Excellent Acuity:</strong> Your vision is above average. Maintain with regular breaks and hydration.';
+  }
+  if(r.blueLight>70){document.getElementById('rec2').innerHTML='<strong>High Blue Light Exposure:</strong> Enable blue light filter at 70%+ and avoid screens 1hr before bed.';}
+  if(radarInst)radarInst.destroy();
+  const ctx=document.getElementById('acuityChart').getContext('2d');
+  radarInst=new Chart(ctx,{type:'bar',data:{labels:state.testResults.map(r=>r.acuity+''),datasets:[{label:'Acuity Score (%)',data:state.testResults.map(r=>r.passed?Math.round((r.acuity/6)*100):0),backgroundColor:state.testResults.map(r=>r.passed?'rgba(15,244,198,0.25)':'rgba(239,68,68,0.2)'),borderColor:state.testResults.map(r=>r.passed?'#0ff4c6':'#ef4444'),borderWidth:2,borderRadius:6}]},options:{scales:{y:{min:0,max:100,ticks:{color:'#4a6080',font:{size:10}},grid:{color:'rgba(255,255,255,.05)'}},x:{ticks:{color:'#8899bb',font:{size:10}},grid:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const tr=state.testResults[ctx.dataIndex];return tr.passed?`Pass — ${tr.fraction}`:'Fail';}}}}}});
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN SETTINGS — FULL ENGINE
+═══════════════════════════════════════════ */
+function ssGetVals(){
+  return {
+    bright: parseInt(document.getElementById('sBright').value),
+    font: parseInt(document.getElementById('sFont').value),
+    blue: parseInt(document.getElementById('sBlue').value),
+    zoom: parseInt(document.getElementById('sZoom').value),
+    contrast: parseInt(document.getElementById('sContrast').value),
+    dark: document.getElementById('tDark').checked,
+    spacing: document.getElementById('tSpacing').checked,
+    auto: document.getElementById('tAuto').checked,
+    highContrast: document.getElementById('tHighContrast').checked,
+    colorTemp: state.colorTemp,
+  };
+}
+
+function setCT(v, el){
+  state.colorTemp=v;
+  document.querySelectorAll('.ss-ct-btn').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active'); else document.getElementById('ct'+v).classList.add('active');
+  ssUpdate();
+}
+
+function initScreenSettings(){
+  if(!state.results)generateResults();
+  const r=state.results||{};
+  // Populate report summary metrics
+  document.getElementById('ssPatientLabel').textContent=`Report for ${state.user.name||'Patient'}, Age ${state.user.age||'—'}`;
+  document.getElementById('ssOverall').textContent=(r.overall||'—')+(r.overall?'':' ');
+  document.getElementById('ssBestAcuity').textContent=r.best?.acuity||'—';
+  document.getElementById('ssBestFraction').textContent=r.best?.fraction||'—';
+  document.getElementById('ssPassed').textContent=(r.passed||0)+'/11';
+  document.getElementById('ssStrain').textContent=(r.strain||'—')+(r.strain?'%':'');
+  document.getElementById('ssDryness').textContent=(r.dryness||'—')+(r.dryness?'%':'');
+  document.getElementById('ssBlueExp').textContent=(r.blueLight||'—')+(r.blueLight?'%':'');
+  ssUpdate();
+}
+
+function ssUpdate(){
+  const v=ssGetVals();
+  // Update slider value displays
+  document.getElementById('vBright').textContent=v.bright+'%';
+  document.getElementById('vFont').textContent=v.font+'px';
+  document.getElementById('vBlue').textContent=v.blue+'%';
+  document.getElementById('vZoom').textContent=v.zoom+'%';
+  document.getElementById('vContrast').textContent=['Low','Medium','High'][v.contrast-1];
+
+  // Compute preview swatch colors
+  const warmth=v.blue/100;
+  const r=Math.round(255*(0.95+warmth*0.05));
+  const g=Math.round(255*(1-warmth*0.14));
+  const b=Math.round(255*(1-warmth*0.34));
+  const bgLum=v.dark?15:Math.round(225-v.bright*1.1);
+  const bg=v.dark?`rgb(${bgLum},${bgLum+3},${bgLum+8})`:`rgb(${r},${Math.min(g+10,255)},${Math.min(b+15,255)})`;
+  const fg=v.dark?'#c8d4f0':'#1a2540';
+
+  const swatch=document.getElementById('ssPreviewSwatch');
+  swatch.style.background=bg; swatch.style.color=fg;
+  const pt=document.getElementById('ssPreviewText');
+  pt.style.fontSize=v.font+'px';
+  pt.style.letterSpacing=v.spacing?'0.04em':'normal';
+  pt.style.fontWeight=v.highContrast?'700':'600';
+
+  // Update preview tags
+  document.getElementById('ssPreviewTags').innerHTML=`
+    <div class="ss-ptag"><strong>Brightness</strong> ${v.bright}%</div>
+    <div class="ss-ptag"><strong>Font</strong> ${v.font}px</div>
+    <div class="ss-ptag"><strong>Zoom</strong> ${v.zoom}%</div>
+    <div class="ss-ptag"><strong>Blue filter</strong> ${v.blue}%</div>
+    <div class="ss-ptag"><strong>Contrast</strong> ${['Low','Medium','High'][v.contrast-1]}</div>
+    <div class="ss-ptag"><strong>Temp</strong> ${v.colorTemp}</div>
+    <div class="ss-ptag"><strong>Dark mode</strong> ${v.dark?'On':'Off'}</div>
+  `;
+}
+
+function ssApplyLive(){
+  const v=ssGetVals();
+  const warmth=v.blue/100;
+  const sepia=Math.round(warmth*58);
+  const bright=Math.round(55+v.bright*0.7);
+  const contrast=['0.85','1.0','1.18'][v.contrast-1];
+  // Apply CSS filter to <html>
+  document.documentElement.style.filter=`brightness(${bright}%) sepia(${sepia}%) contrast(${contrast})`;
+  // Apply font size via CSS variable
+  document.documentElement.style.setProperty('--page-font-size', v.font+'px');
+  // Apply letter spacing
+  document.body.style.letterSpacing=v.spacing?'0.02em':'normal';
+  ssToast('✓ Settings applied to this page!');
+  // Also sync to backend
+  if(state.sessionId){
+    apiRequest(`/sessions/${state.sessionId}/settings`,{method:'POST',body:JSON.stringify({
+      brightness:v.bright,font_size:v.font,blue_filter:v.blue,display_zoom:v.zoom,
+      dark_mode:v.dark,contrast:['Low','Medium','High'][v.contrast-1],
+    })}).catch(()=>{});
+  }
+}
+
+function ssToggleExport(){
+  const panel=document.getElementById('ssExportPanel');
+  panel.classList.toggle('open');
+}
+
+function ssCopySettings(){
+  const v=ssGetVals();
+  const txt=`NeuroVision AI — Recommended Screen Settings
+────────────────────────────────────────
+Brightness      : ${v.bright}%
+Font Size       : ${v.font}px
+Blue Light      : ${v.blue}%
+Display Zoom    : ${v.zoom}%
+Contrast        : ${['Low','Medium','High'][v.contrast-1]}
+Dark Mode       : ${v.dark?'Enabled':'Disabled'}
+Text Spacing    : ${v.spacing?'Wide':'Normal'}
+High Contrast   : ${v.highContrast?'Yes':'No'}
+Color Temp      : ${v.colorTemp}
+Auto Night Mode : ${v.auto?'Yes':'No'}
+────────────────────────────────────────
+Generated by NeuroVision AI`;
+  navigator.clipboard.writeText(txt)
+    .then(()=>ssToast('📋 Copied to clipboard!'))
+    .catch(()=>ssToast('⚠ Clipboard unavailable — please copy manually.'));
+}
+
+function ssDlWindows(){
+  const v=ssGetVals();
+  const dpi=Math.round(96*(v.zoom/100));
+  const ctNote=v.colorTemp==='Night'?'Night mode (2700K warmth)':v.colorTemp==='Warm'?'Warm (3000K)':'Daylight D65';
+  const script=`# NeuroVision AI — Windows Display Settings Script
+# Generated: ${new Date().toLocaleString()}
+# Run this file as Administrator in PowerShell
+# Right-click → "Run with PowerShell" (select "Run as Administrator")
+
+param(
+  [switch]$WhatIf
+)
+
+$ErrorActionPreference = "Continue"
+Write-Host "NeuroVision AI — Applying display settings..." -ForegroundColor Cyan
+Write-Host ""
+
+# ─────────────────────────────────────
+# 1. DARK MODE (Apps + System)
+# ─────────────────────────────────────
+$themePath = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize'
+if (!(Test-Path $themePath)) { New-Item -Path $themePath -Force | Out-Null }
+$darkValue = ${v.dark ? 0 : 1}
+if (!$WhatIf) {
+  Set-ItemProperty -Path $themePath -Name 'AppsUseLightTheme'   -Value $darkValue -Type DWord
+  Set-ItemProperty -Path $themePath -Name 'SystemUsesLightTheme' -Value $darkValue -Type DWord
+}
+Write-Host "[1/6] Dark Mode: ${v.dark ? 'ENABLED' : 'DISABLED'}" -ForegroundColor ${v.dark ? 'Green' : 'Yellow'}
+
+# ─────────────────────────────────────
+# 2. DISPLAY BRIGHTNESS via WMI
+#    (works on laptops / integrated panels)
+# ─────────────────────────────────────
+try {
+  $monitors = Get-CimInstance -Namespace root/WMI -Class WmiMonitorBrightnessMethods -ErrorAction Stop
+  foreach ($mon in $monitors) {
+    if (!$WhatIf) { $mon.WmiSetBrightness(0, ${v.bright}) }
+  }
+  Write-Host "[2/6] Brightness: ${v.bright}%" -ForegroundColor Green
+} catch {
+  Write-Host "[2/6] Brightness: Cannot set via WMI (external monitor?). Open Settings > Display > Brightness." -ForegroundColor Yellow
+}
+
+# ─────────────────────────────────────
+# 3. DPI SCALING (Display Zoom ${v.zoom}%)
+#    Requires sign out / restart to apply fully
+# ─────────────────────────────────────
+$deskPath = 'HKCU:\\Control Panel\\Desktop'
+if (!$WhatIf) {
+  Set-ItemProperty -Path $deskPath -Name 'LogPixels' -Value ${dpi} -Type DWord
+  Set-ItemProperty -Path $deskPath -Name 'Win8DpiScaling' -Value 1 -Type DWord
+}
+Write-Host "[3/6] DPI Scaling: ${v.zoom}% (${dpi} DPI) — sign out to apply" -ForegroundColor Yellow
+
+# ─────────────────────────────────────
+# 4. HIGH CONTRAST${v.highContrast ? ' (ENABLED)' : ''}
+# ─────────────────────────────────────
+$hcPath = 'HKCU:\\Control Panel\\Accessibility\\HighContrast'
+if (!(Test-Path $hcPath)) { New-Item -Path $hcPath -Force | Out-Null }
+$hcFlags = ${v.highContrast ? 63 : 0}
+if (!$WhatIf) { Set-ItemProperty -Path $hcPath -Name 'Flags' -Value $hcFlags -Type DWord }
+Write-Host "[4/6] High Contrast: ${v.highContrast ? 'ENABLED' : 'DISABLED'}" -ForegroundColor ${v.highContrast ? 'Green' : 'Gray'}
+
+# ─────────────────────────────────────
+# 5. NIGHT LIGHT / BLUE FILTER
+#    Windows Night Light is stored in a binary blob; 
+#    the Settings app is the most reliable way to set strength.
+#    Blue Light Filter target: ${v.blue}% — Color Temp: ${ctNote}
+# ─────────────────────────────────────
+Write-Host "[5/6] Blue Light Filter: ${v.blue}% — Opening Night Light settings..." -ForegroundColor Cyan
+
+# ─────────────────────────────────────
+# 6. TEXT SPACING & FONT SIZE
+#    Windows does not expose a direct font-size registry key for all apps.
+#    Font size is controlled via Accessibility > Make text bigger.
+#    Recommended: ${v.font}px / ${Math.round((v.font/16)*100)}% text size
+# ─────────────────────────────────────
+Write-Host "[6/6] Font Size: ${v.font}px (set manually in Settings > Ease of Access > Display)" -ForegroundColor Cyan
+
+# ─────────────────────────────────────
+# OPEN RELEVANT SETTINGS PAGES
+# ─────────────────────────────────────
+Write-Host ""
+Write-Host "Opening Windows Settings pages for manual review..." -ForegroundColor Cyan
+$pages = @(
+  'ms-settings:display',
+  'ms-settings:personalization',
+  'ms-settings:nightlight',
+  'ms-settings:easeofaccess-display'
+)
+foreach ($page in $pages) {
+  Start-Process $page
+  Start-Sleep -Milliseconds 300
+}
+
+Write-Host ""
+Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host " NeuroVision AI — Settings Summary" -ForegroundColor White
+Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "  Brightness   : ${v.bright}%"
+Write-Host "  Font Size    : ${v.font}px (manual)"
+Write-Host "  Blue Filter  : ${v.blue}% (Night Light)"
+Write-Host "  Display Zoom : ${v.zoom}% (${dpi} DPI)"
+Write-Host "  Dark Mode    : ${v.dark}"
+Write-Host "  Contrast     : ${['Low','Medium','High'][v.contrast-1]}"
+Write-Host "  Color Temp   : ${v.colorTemp}"
+Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Done! Sign out and back in for DPI changes to take full effect." -ForegroundColor Yellow
+`;
+  ssDl('NeuroVision_Windows_Settings.ps1', script, 'text/plain');
+  ssToast('🪟 Windows PowerShell script downloaded!');
+}
+
+function ssDlMac(){
+  const v=ssGetVals();
+  const script=`#!/bin/bash
+# NeuroVision AI — macOS Display Settings Script
+# Generated: ${new Date().toLocaleString()}
+# Usage: chmod +x NeuroVision_macOS_Settings.sh && ./NeuroVision_macOS_Settings.sh
+
+set -e
+echo "NeuroVision AI — Applying macOS display settings..."
+echo ""
+
+# ─────────────────────────────────
+# 1. DARK MODE
+# ─────────────────────────────────
+DARK_MODE="${v.dark}"
+if [ "$DARK_MODE" = "true" ]; then
+  osascript -e 'tell application "System Events" to tell appearance preferences to set dark mode to true'
+  echo "[1/5] Dark mode: ENABLED ✓"
+else
+  osascript -e 'tell application "System Events" to tell appearance preferences to set dark mode to false'
+  echo "[1/5] Dark mode: DISABLED"
+fi
+
+# ─────────────────────────────────
+# 2. NIGHT SHIFT (Blue Light ${v.blue}%)
+#    AppleScript Night Shift via CoreBrightness
+# ─────────────────────────────────
+NS_ENABLED="${v.blue > 20 ? 'true' : 'false'}"
+echo "[2/5] Night Shift (Blue filter ${v.blue}%): opening System Preferences..."
+open "x-apple.systempreferences:com.apple.preference.displays?NightShift"
+
+# ─────────────────────────────────
+# 3. DISPLAY BRIGHTNESS (${v.bright}%)
+# ─────────────────────────────────
+BRIGHTNESS=$(echo "scale=2; ${v.bright}/100" | bc)
+osascript -e "tell application \\"System Events\\" to set value of slider \\"Brightness\\" of group 1 of tab group 1 of window \\"Displays\\" of process \\"System Preferences\\" to $BRIGHTNESS" 2>/dev/null || true
+echo "[3/5] Brightness: ${v.bright}% (open System Prefs > Displays to adjust)"
+
+# ─────────────────────────────────
+# 4. DISPLAY ZOOM (${v.zoom}%)
+# ─────────────────────────────────
+echo "[4/5] Display Zoom: ${v.zoom}% — opening Display Preferences..."
+open "x-apple.systempreferences:com.apple.preference.displays"
+
+# ─────────────────────────────────
+# 5. ACCESSIBILITY — TEXT SIZE & CONTRAST
+# ─────────────────────────────────
+HC="${v.highContrast}"
+if [ "$HC" = "true" ]; then
+  defaults write com.apple.universalaccess increaseContrast -bool YES
+  echo "[5/5] High Contrast: ENABLED ✓"
+else
+  defaults write com.apple.universalaccess increaseContrast -bool NO
+  echo "[5/5] High Contrast: DISABLED"
+fi
+open "x-apple.systempreferences:com.apple.preference.universalaccess?Seeing_Display"
+
+echo ""
+echo "═══════════════════════════════════════════"
+echo " NeuroVision AI — Settings Summary"
+echo "═══════════════════════════════════════════"
+echo "  Brightness   : ${v.bright}%"
+echo "  Font Size    : ${v.font}px (set in Accessibility > Display)"
+echo "  Blue Filter  : ${v.blue}% (Night Shift)"
+echo "  Display Zoom : ${v.zoom}%"
+echo "  Dark Mode    : ${v.dark}"
+echo "  Contrast     : ${['Low','Medium','High'][v.contrast-1]}"
+echo "  Color Temp   : ${v.colorTemp}"
+echo "═══════════════════════════════════════════"
+echo ""
+echo "Done! Log out and back in if text changes are not visible."
+`;
+  ssDl('NeuroVision_macOS_Settings.sh', script, 'text/plain');
+  ssToast('🍎 macOS shell script downloaded!');
+}
+
+function ssDlCSS(){
+  const v=ssGetVals();
+  const warmth=v.blue/100;
+  const sepia=Math.round(warmth*55);
+  const bright=Math.round(55+v.bright*0.65);
+  const ctColor=v.colorTemp==='Night'?'255,165,60':v.colorTemp==='Warm'?'255,210,110':'255,255,255';
+  const ctAlpha=Math.round(warmth*0.20*100)/100;
+  const css=`/* ═══════════════════════════════════════════════════════
+   NeuroVision AI — Browser CSS Override
+   Generated: ${new Date().toLocaleString()}
+
+   HOW TO USE:
+   1. DevTools Console: paste and press Enter
+      document.head.insertAdjacentHTML('beforeend', '<style id="nv-override">..paste file content..</style>')
+   2. Stylus / Tampermonkey: add as a global userscript
+   3. Browser extension (User CSS): add as a site override
+═══════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────
+   Global Filter (Brightness + Blue Light + Contrast)
+───────────────────────────────── */
+html {
+  filter: brightness(${bright}%) sepia(${sepia}%) contrast(${['0.85','1.0','1.18'][v.contrast-1]}) !important;
+}
+
+/* ─────────────────────────────────
+   Font Size & Spacing
+───────────────────────────────── */
+body, p, span, div, li, td, th, input, button, label {
+  font-size: ${v.font}px !important;
+  letter-spacing: ${v.spacing ? '0.03em' : 'normal'} !important;
+  font-weight: ${v.highContrast ? '500' : 'inherit'} !important;
+}
+
+h1 { font-size: ${Math.round(v.font * 2)}px !important; }
+h2 { font-size: ${Math.round(v.font * 1.6)}px !important; }
+h3 { font-size: ${Math.round(v.font * 1.3)}px !important; }
+
+/* ─────────────────────────────────
+   Zoom / Scale
+───────────────────────────────── */
+html {
+  zoom: ${v.zoom / 100} !important;
+}
+
+/* ─────────────────────────────────
+   Color Temperature Overlay (${v.colorTemp})
+   Simulates ${v.colorTemp === 'Night' ? '2700K Night mode' : v.colorTemp === 'Warm' ? '3000K warm white' : 'standard D65 daylight'}
+───────────────────────────────── */
+${ctAlpha > 0.01 ? `html::after {
+  content: '' !important;
+  position: fixed !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 2147483647 !important;
+  mix-blend-mode: multiply !important;
+  background: rgba(${ctColor}, ${ctAlpha}) !important;
+}` : '/* Color temp: D65 — no overlay needed */'}
+
+/* ─────────────────────────────────
+   Dark Mode (${v.dark ? 'Enabled' : 'Disabled'})
+───────────────────────────────── */
+${v.dark ? `@media (prefers-color-scheme: light) {
+  html {
+    filter: brightness(${bright}%) sepia(${sepia}%) invert(1) hue-rotate(180deg) contrast(${['0.85','1.0','1.18'][v.contrast-1]}) !important;
+  }
+  img, video, canvas, svg, iframe {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+}` : '/* Dark mode: OFF — no inversion applied */'}
+
+/* ─────────────────────────────────
+   High Contrast Enhancement (${v.highContrast ? 'Enabled' : 'Disabled'})
+───────────────────────────────── */
+${v.highContrast ? `*, *::before, *::after {
+  text-shadow: none !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+p, span, li, td, th {
+  font-weight: 500 !important;
+}` : '/* High contrast: OFF */'}
+
+/* Generated by NeuroVision AI — ${new Date().toLocaleDateString()} */
+`;
+  ssDl('NeuroVision_CSS_Override.css', css, 'text/css');
+  ssToast('🎨 CSS override file downloaded!');
+}
+
+function ssDlJSON(){
+  const v=ssGetVals();
+  const r=state.results||{};
+  const payload={
+    neurovision_settings:{
+      version:'1.0',
+      generated:new Date().toISOString(),
+      patient:{name:state.user.name,age:state.user.age,gender:state.user.gender},
+      vision_results:{
+        overall_score:r.overall,best_acuity:r.best?.acuity,best_fraction:r.best?.fraction,
+        levels_passed:r.passed,strain_risk:r.strain,dryness_index:r.dryness,blue_light_exposure:r.blueLight,
+      },
+      display:{
+        brightness_pct:v.bright,font_size_px:v.font,blue_filter_pct:v.blue,
+        display_zoom_pct:v.zoom,contrast:['Low','Medium','High'][v.contrast-1],
+        dark_mode:v.dark,text_spacing_wide:v.spacing,high_contrast:v.highContrast,
+        color_temp:v.colorTemp,auto_night_mode:v.auto,
+      },
+      api_payload:{
+        brightness:v.bright,font_size:v.font,blue_filter:v.blue,
+        display_zoom:v.zoom,dark_mode:v.dark,contrast:['Low','Medium','High'][v.contrast-1],
+      }
+    }
+  };
+  ssDl('NeuroVision_Settings.json',JSON.stringify(payload,null,2),'application/json');
+  ssToast('📦 JSON config downloaded!');
+}
+
+function ssOpenWinSettings(){
+  const pages=['ms-settings:display','ms-settings:personalization','ms-settings:nightlight','ms-settings:easeofaccess-display'];
+  pages.forEach((p,i)=>setTimeout(()=>{try{window.open(p,'_blank');}catch(e){}},i*250));
+  ssToast('⚙️ Opening Windows Settings pages...');
+}
+
+function ssPrintCard(){
+  const v=ssGetVals();const r=state.results||{};
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>NeuroVision AI — Settings Card</title>
+<style>
+  @media print{@page{margin:20mm}}
+  body{font-family:Arial,sans-serif;padding:32px;max-width:620px;margin:0 auto;color:#1a2540}
+  h1{font-size:20px;color:#185FA5;margin-bottom:3px}
+  .sub{font-size:12px;color:#64748b;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid #e2e8f0}
+  .section{margin-bottom:20px}
+  .section-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;margin-bottom:8px}
+  table{width:100%;border-collapse:collapse}
+  tr:nth-child(even){background:#f8fafc}
+  td{padding:8px 10px;font-size:13px;border-bottom:1px solid #f1f5f9}
+  td:first-child{color:#64748b;width:45%}
+  td:last-child{font-weight:600;color:#185FA5}
+  .footer{font-size:10px;color:#94a3b8;margin-top:24px;border-top:1px solid #e2e8f0;padding-top:12px}
+  .warning{font-size:11px;color:#d97706;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;margin-top:12px}
+</style></head><body>
+<h1>NeuroVision AI — Screen Settings Card</h1>
+<div class="sub">Patient: ${state.user.name||'—'} · Age: ${state.user.age||'—'} · Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</div>
+<div class="section">
+  <div class="section-title">Vision Test Summary</div>
+  <table>
+    <tr><td>Overall Score</td><td>${r.overall||'—'}/100</td></tr>
+    <tr><td>Best Acuity</td><td>${r.best?.acuity||'—'} (${r.best?.fraction||'—'})</td></tr>
+    <tr><td>Levels Passed</td><td>${r.passed||0}/11</td></tr>
+    <tr><td>Eye Strain Risk</td><td>${r.strain||'—'}%</td></tr>
+    <tr><td>Blue Light Exposure</td><td>${r.blueLight||'—'}%</td></tr>
+  </table>
+</div>
+<div class="section">
+  <div class="section-title">Recommended Display Settings</div>
+  <table>
+    <tr><td>Brightness</td><td>${v.bright}%</td></tr>
+    <tr><td>Font Size</td><td>${v.font}px</td></tr>
+    <tr><td>Blue Light Filter</td><td>${v.blue}%</td></tr>
+    <tr><td>Display Zoom / Scaling</td><td>${v.zoom}%</td></tr>
+    <tr><td>Contrast Level</td><td>${['Low','Medium','High'][v.contrast-1]}</td></tr>
+    <tr><td>Dark Mode</td><td>${v.dark?'Enabled':'Disabled'}</td></tr>
+    <tr><td>Text Spacing</td><td>${v.spacing?'Wide':'Normal'}</td></tr>
+    <tr><td>High Contrast</td><td>${v.highContrast?'Enabled':'Disabled'}</td></tr>
+    <tr><td>Color Temperature</td><td>${v.colorTemp}</td></tr>
+    <tr><td>Auto Night Mode</td><td>${v.auto?'Enabled':'Disabled'}</td></tr>
+  </table>
+</div>
+<div class="warning">⚠ This card is for informational purposes only. Please consult a licensed ophthalmologist for medical diagnosis and prescription advice.</div>
+<div class="footer">Generated by NeuroVision AI · ${window.location.hostname||'neurovision-ai'} · This report does not replace professional medical advice.</div>
+</body></html>`;
+  const w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();setTimeout(()=>w.print(),500);}
+  ssToast('🖨️ Print dialog opened!');
+}
+
+function ssDl(name, content, type){
+  const b=new Blob([content],{type});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+function ssToast(msg){
+  const t=document.getElementById('ssToast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ═══════════════ DOWNLOAD REPORTS ═══════════════ */
+function downloadTestReport(){
+  const passed=state.testResults.filter(r=>r.passed).length;
+  const best=state.testResults.filter(r=>r.passed).reduce((a,b)=>b.acuity>a.acuity?b:a,{acuity:0,fraction:'—'});
+  const rows=state.testResults.map(r=>`  ${String(r.acuity).padEnd(6)} | ${r.fraction.padEnd(8)} | ${r.name.padEnd(20)} | Target: ${r.letters.padEnd(20)} | Answer: ${r.chosen.padEnd(12)} | ${r.passed?'PASS':'FAIL'}`).join('\n');
+  const text=`
+╔══════════════════════════════════════════════════════════════╗
+║           NEUROVISION AI — SNELLEN VISION TEST REPORT        ║
+╚══════════════════════════════════════════════════════════════╝
+
+PATIENT INFORMATION
+───────────────────
+Name    : ${state.user.name||'N/A'}
+Age     : ${state.user.age||'N/A'}
+Gender  : ${state.user.gender||'N/A'}
+Date    : ${new Date().toLocaleDateString()}
+Time    : ${new Date().toLocaleTimeString()}
+Eye Mode: ${state.eyeMode==='both'?'Both Eyes':state.eyeMode==='left'?'Left Eye Only':'Right Eye Only'}
+
+SNELLEN CHART RESULTS (11 Levels: 0.25 → 6.0)
+──────────────────────────────────────────────
+${rows}
+
+SUMMARY
+───────
+Levels Passed : ${passed} / 11
+Best Acuity   : ${best.acuity} (${best.fraction})
+Pass Rate     : ${Math.round((passed/11)*100)}%
+
+VISION CLASSIFICATION
+──────────────────────
+${best.acuity>=4.0?'🦅 Superior / Hawk-Eye Vision':best.acuity>=2.0?'⭐ Excellent Vision':best.acuity>=1.25?'✅ Good Vision':best.acuity>=1.0?'✅ Normal Vision (20/20)':best.acuity>=0.5?'⚠️  Below Normal — Correction Recommended':'❌ Very Low Acuity — Urgent Consultation Needed'}
+
+RECOMMENDATIONS
+───────────────
+${best.acuity<1.0?'• Schedule urgent optometrist appointment\n• Consider prescription glasses or contact lenses':'• Maintain healthy vision habits'}
+• 20-20-20 rule: every 20 min, look 20 ft away for 20 sec
+• Enable blue light filter on all screens
+• Maintain 50–70 cm screen distance
+• Annual eye exam recommended
+
+──────────────────────────────────────────────────────────────
+Generated by NeuroVision AI
+This report is for informational purposes only.
+Consult a licensed ophthalmologist for medical advice.
+──────────────────────────────────────────────────────────────`.trim();
+  const blob=new Blob([text],{type:'text/plain'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`NeuroVision_Snellen_${state.user.name||'Patient'}.txt`; a.click();
+}
+
+function downloadReport(){
+  generateResults();
+  const r=state.results||{};
+  const v=ssGetVals();
+  const rows=state.testResults.map(x=>`  ${String(x.acuity).padEnd(6)} | ${x.fraction.padEnd(8)} | ${x.name.padEnd(20)} | ${x.passed?'PASS':'FAIL'}`).join('\n');
+  const text=`
+╔══════════════════════════════════════════════════════════════╗
+║         NEUROVISION AI — COMPLETE VISION HEALTH REPORT       ║
+╚══════════════════════════════════════════════════════════════╝
+
+PATIENT INFORMATION
+───────────────────
+Name    : ${state.user.name||'N/A'}
+Age     : ${state.user.age||'N/A'}
+Gender  : ${state.user.gender||'N/A'}
+Date    : ${new Date().toLocaleDateString()}
+Eye Mode: ${state.eyeMode==='both'?'Both Eyes':state.eyeMode==='left'?'Left Eye Only':'Right Eye Only'}
+
+OVERALL VISION SCORE: ${r.overall||'—'} / 100
+Grade: ${r.overall>=85?'Excellent':r.overall>=70?'Good':r.overall>=55?'Fair':'Needs Attention'}
+
+SNELLEN TEST RESULTS
+────────────────────
+${rows}
+
+  Levels Passed : ${r.passed||0} / 11
+  Best Acuity   : ${r.best?.acuity||'—'} (${r.best?.fraction||'—'}) — ${r.best?.name||'—'}
+  Pass Rate     : ${Math.round(((r.passed||0)/11)*100)}%
+
+HEALTH METRICS
+──────────────
+  Eye Strain Risk     : ${r.strain||'—'}%
+  Dryness Index       : ${r.dryness||'—'}%
+  Blue Light Exposure : ${r.blueLight||'—'}%
+
+RECOMMENDED SCREEN SETTINGS
+────────────────────────────
+  Brightness   : ${v.bright}%
+  Font Size    : ${v.font}px
+  Blue Filter  : ${v.blue}%
+  Display Zoom : ${v.zoom}%
+  Dark Mode    : ${v.dark?'Enabled':'Disabled'}
+  Contrast     : ${['Low','Medium','High'][v.contrast-1]}
+  Color Temp   : ${v.colorTemp}
+
+RECOMMENDATIONS
+───────────────
+${(r.best?.acuity||0)<1.0?'• URGENT: Schedule optometrist appointment — vision below 20/20\n• Consider corrective lenses':'• Vision is in normal-to-excellent range'}
+• 20-20-20 rule every 20 minutes
+• Blue light filter at ${v.blue}% on all screens
+• Reduce brightness to ${v.bright}% in low-light
+• Maintain 50–70 cm screen distance
+• Annual comprehensive eye exam
+
+──────────────────────────────────────────────────────────────
+Generated by NeuroVision AI
+This report is for informational purposes only.
+Consult a licensed ophthalmologist for medical diagnosis.
+──────────────────────────────────────────────────────────────`.trim();
+  const blob=new Blob([text],{type:'text/plain'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`NeuroVision_Complete_${state.user.name||'Patient'}.txt`; a.click();
+}
+</script>
+</body>
+</html>

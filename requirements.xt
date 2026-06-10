@@ -1,0 +1,18 @@
+# NeuroVision AI — Python Backend Requirements
+# Install with:  pip install -r requirements.txt
+
+flask==3.0.3
+flask-cors==4.0.1
+werkzeug==3.0.3
+
+# JWT authentication
+PyJWT==2.8.0
+
+# Async HTTP client (for Claude API calls)
+httpx==0.27.0
+
+# PDF generation
+reportlab==4.2.2
+
+# Anthropic SDK (optional — backend uses raw httpx, but handy for testing)
+anthropic==0.29.0
